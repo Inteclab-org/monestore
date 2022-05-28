@@ -22,6 +22,10 @@ module.exports = async (sequelize, DataTypes) => {
         payment_image_id: {
             type: DataTypes.STRING(100),
         },
+        payment_pending: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        },
         is_paid: {
             type: DataTypes.BOOLEAN,
         },

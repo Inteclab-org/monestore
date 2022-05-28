@@ -34,7 +34,8 @@ const {
     changeToEditMenu,
     endOrderProccess,
     saveOrder,
-    continueOrderProccess
+    continueOrderProccess,
+    getPaymentImage
 } = require('./src/controllers/controllers')
 const messages = require('./src/assets/messages')
 
@@ -144,8 +145,7 @@ bot.hears("Ha", async (ctx) => {
     switch (ctx.session.step) {
         case "verify":
             await saveOrder(ctx)
-            ctx.session.step = "menu"
-            await sendMenu(ctx)
+            ctx.session.step = "payment"
             await updateUserStep(ctx, ctx.session.step)
             break;
         default:
@@ -192,6 +192,13 @@ router.route("amount", async (ctx) => {
     let a = await setManualAmount(ctx)
     if (!a) return
     ctx.session.step = "order"
+    await updateUserStep(ctx, ctx.session.step)
+})
+
+router.route("payment", async (ctx) => {
+    let a = await getPaymentImage(ctx)
+    if (!a) return
+    ctx.session.step = "menu"
     await updateUserStep(ctx, ctx.session.step)
 })
 

@@ -574,12 +574,6 @@ module.exports = class Controllers {
                 }
             }
 
-            await ctx.reply(messages[ctx.session.user.lang].checkDataMsg, {
-                parse_mode: "HTML",
-                reply_markup: {
-                    remove_keyboard: true
-                }
-            })
             await ctx.reply(messages[ctx.session.user.lang].areYouSureMsg, {
                 parse_mode: "HTML",
                 reply_markup: {
@@ -606,7 +600,8 @@ module.exports = class Controllers {
             })
 
             const order = await orders.create({
-                user_id: user.id
+                user_id: user.id,
+                is_verified: true,
             })
 
             for (const key in ordersObj) {
@@ -620,8 +615,10 @@ module.exports = class Controllers {
             }
 
             ctx.session.order = {}
+            ctx.session.current_order_id = order.id
 
-            await ctx.reply(messages[ctx.session.user.lang].verifiedMsg, {
+            // buni o'zgartirish kerak!
+            await ctx.reply(`${messages[ctx.session.user.lang].verifiedMsg} \n Umumiy narx: 200000 \n To'lov rasmini (skrinshot) jo'nating`, {
                 parse_mode: "HTML",
                 reply_markup: {
                     remove_keyboard: true
@@ -633,13 +630,8 @@ module.exports = class Controllers {
     }
 
     static async continueOrderProccess(ctx) {
-        await ctx.reply(messages[ctx.session.user.lang].verifyStoppedMsg, {
-            parse_mode: "HTML",
-            reply_markup: {
-                remove_keyboard: true
-            }
-        })
-        await ctx.reply(messages[ctx.session.user.lang].continueOrderMsg, {
+        await ctx.reply(`${messages[ctx.session.user.lang].verifyStoppedMsg} 
+        ${ messages[ctx.session.user.lang].continueOrderMsg}`, {
             parse_mode: "HTML",
             reply_markup: {
                 resize_keyboard: true,
@@ -659,6 +651,65 @@ module.exports = class Controllers {
                     remove_keyboard: true
                 }
             })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    static async getPaymentImage(ctx){
+        try {
+            if(!ctx.msg.photo){
+                await ctx.reply("Rasm jo'natishingiz kerak!", {
+                    parse_mode: "HTML"
+                })
+                return false
+            }
+
+            const order = await orders.findOne({
+                where: {
+                    id: ctx.session.current_order_id
+                }
+            })
+
+            if(order && order.payment_pending){
+                await ctx.reply("Avvalgi to'lov hali adminlar tomonidan ko'rib chiqilmagan. Iltimos, javobni kuting.", {
+                    parse_mode: "HTML"
+                })
+                return false
+            }
+
+            const file = await ctx.getFile()
+            const file_id = file.file_id
+
+            const updated_order = await orders.update({
+                payment_image_id: file_id,
+                status: 2
+            }, {
+                where: {
+                    id: ctx.session.current_order_id
+                }
+            })
+
+            if(!updated_order[0]) return false
+
+            await ctx.reply("To'lov tasdiqlanishini kuting...", {
+                parse_mode: "HTML"
+            })
+
+            setTimeout(async () => {
+                await orders.update({
+                    payment_pending: false,
+                    is_paid: true,
+                    status: 3
+                }, {
+                    where: {
+                        id: ctx.session.current_order_id
+                    }
+                })
+                await ctx.reply("To'lov tasdiqlandi, haridingiz uchun tashakkur!", {
+                    parse_mode: "HTML"
+                })
+            }, 2000)
         } catch (error) {
             console.log(error);
         }
