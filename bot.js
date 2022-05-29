@@ -36,25 +36,12 @@ const {
     saveOrder,
     continueOrderProccess,
     getPaymentImage
-} = require('./src/controllers/controllers')
+} = require('./src/controllers/bot/controllers')
 const messages = require('./src/assets/messages')
 
 const {
     users
 } = sequelize.models
-
-;
-(async () => {
-    try {
-        await sequelize.sync({
-            force: false
-        })
-        // await sequelize.sync()
-
-    } catch (error) {
-        console.log(error);
-    }
-})()
 
 const bot = new Bot(configs.TG_TOKEN);
 
