@@ -2,6 +2,7 @@ require('dotenv').config()
 const { env } = require('process');
 
 const configs = {
+    PORT: env.PORT,
     DB_HOST: env.DB_HOST,
     DB_USER: env.DB_USER,
     DB_PORT: env.DB_PORT,
