@@ -4,8 +4,8 @@
   "description": "test bot",
   "main": "bot.js",
   "scripts": {
-    "dev": "nodemon -r dotenv/config bot.js",
-    "start": "node -r dotenv/config bot.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
