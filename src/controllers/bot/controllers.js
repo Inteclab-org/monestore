@@ -38,7 +38,7 @@ module.exports = class Controllers {
     // LANGUAGE
 
     static async selectLanguage(ctx) {
-        let x = await ctx.reply(messages.uz.startMsg, {
+        let x = await ctx.reply(messages.startMsg, {
             parse_mode: "HTML",
             reply_markup: InlineKeyboards.select_language,
         })
@@ -719,6 +719,20 @@ module.exports = class Controllers {
                     parse_mode: "HTML"
                 })
             }, 2000)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    static async deleteItem(ctx){
+        try {
+            const {
+                query
+            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+
+            delete ctx.session.order[query.item_id]
+
+            await ctx.api.deleteMessage(ctx.msg.chat.id, ctx.callbackQuery.message.message_id)
         } catch (error) {
             console.log(error);
         }

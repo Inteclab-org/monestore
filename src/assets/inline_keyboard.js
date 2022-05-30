@@ -45,7 +45,9 @@ const InlineKeyboards = {
         edit_item_menu: (item_id) =>
             new InlineKeyboard()
             .text("O'lchamni o'zgartirish", `change_size?item_id=${item_id}`)
-            .text("Miqdorni o'zgartirish", `change_amount?item_id=${item_id}`),
+            .text("Miqdorni o'zgartirish", `change_amount?item_id=${item_id}`)
+            .row()
+            .text("O'chirish", `delete_item?item_id=${item_id}`),
 
         back: (value) => new InlineKeyboard().text("Orqaga", `back?step=${value}`),
     },
@@ -86,10 +88,12 @@ const InlineKeyboards = {
             .row()
             .text("Boshqa miqdor", `manual_amount`),
 
-        edit_item_menu:
+        edit_item_menu: (item_id) =>
             new InlineKeyboard()
-            .text("O'lchamni o'zgartirish", `change_size`)
-            .text("Miqdorni o'zgartirish", `change_amount`),
+            .text("O'lchamni o'zgartirish", `change_size?item_id=${item_id}`)
+            .text("Miqdorni o'zgartirish", `change_amount?item_id=${item_id}`)
+            .row()
+            .text("O'chirish", `delete_item?item_id=${item_id}`),
 
         back: (value) => new InlineKeyboard().text("Orqaga", `back?step=${value}`),
     }
