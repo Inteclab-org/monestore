@@ -1,23 +1,22 @@
-const { InlineKeyboard } = require("grammy");
+const {
+    InlineKeyboard
+} = require("grammy");
 
 const InlineKeyboards = {
-    select_language: 
-        new InlineKeyboard()
+    select_language: new InlineKeyboard()
         .text("Uzbek", "set_language?value=uz")
         .text("Russian", "set_language?value=ru"),
     uz: {
-        menu: 
-            new InlineKeyboard()
+        menu: new InlineKeyboard()
             .text("Buyurtma berish", "new_order")
             .row()
             .text("Ma'lumot", "settings")
             .text("Buyurtmalar", "my_orders"),
 
-        order_first_step_menu: 
-            new InlineKeyboard()
+        order_first_step_menu: new InlineKeyboard()
             .url("Mahsulotlar", "https://google.com/Uy-va-texnika-jixozlari-03-11"),
 
-        sizes_menu: (item_id) => 
+        sizes_menu: (item_id) =>
             new InlineKeyboard()
             .text("XXL", `set_size?size=xxl&item_id=${item_id}`)
             .text("XL", `set_size?size=xl&item_id=${item_id}`)
@@ -26,7 +25,7 @@ const InlineKeyboards = {
             .text("L", `set_size?size=l&item_id=${item_id}`)
             .text("X", `set_size?size=x&item_id=${item_id}`),
 
-        amount_menu: (item_id) => 
+        amount_menu: (item_id) =>
             new InlineKeyboard()
             .text("1", `set_amount?value=1&item_id=${item_id}`)
             .text("2", `set_amount?value=2&item_id=${item_id}`)
@@ -49,21 +48,28 @@ const InlineKeyboards = {
             .row()
             .text("O'chirish", `delete_item?item_id=${item_id}`),
 
+        user_info_menu: (step) =>
+            new InlineKeyboard()
+            .text("Ismni o'zgartirish", `change_user_info?step=name`)
+            .text("Raqamni o'zgartirish", `change_user_info?step=phone`)
+            .row()
+            .text("Tilni o'zgartirish", `change_user_info?step=lang`)
+            .row()
+            .text("Orqaga", `back?step=${step}`),
+
         back: (value) => new InlineKeyboard().text("Orqaga", `back?step=${value}`),
     },
     ru: {
-        menu: 
-            new InlineKeyboard()
+        menu: new InlineKeyboard()
             .text("Buyurtma berish", "new_order")
             .row()
             .text("Ma'lumot", "settings")
             .text("Buyurtmalar", "my_orders"),
 
-        order_first_step_menu: 
-            new InlineKeyboard()
+        order_first_step_menu: new InlineKeyboard()
             .url("Mahsulotlar", "https://google.com/Uy-va-texnika-jixozlari-03-11"),
 
-        sizes_menu: (item_id) => 
+        sizes_menu: (item_id) =>
             new InlineKeyboard()
             .text("XXL", `set_size?size=xxl&item_id=${item_id}`)
             .text("XL", `set_size?size=xl&item_id=${item_id}`)
@@ -72,7 +78,7 @@ const InlineKeyboards = {
             .text("L", `set_size?size=l&item_id=${item_id}`)
             .text("X", `set_size?size=x&item_id=${item_id}`),
 
-        amount_menu: (item_id) => 
+        amount_menu: (item_id) =>
             new InlineKeyboard()
             .text("1", `set_amount?value=1&item_id=${item_id}`)
             .text("2", `set_amount?value=2&item_id=${item_id}`)
@@ -86,7 +92,7 @@ const InlineKeyboards = {
             .text("9", `set_amount?value=9&item_id=${item_id}`)
             .text("10", `set_amount?value=10&item_id=${item_id}`)
             .row()
-            .text("Boshqa miqdor", `manual_amount`),
+            .text("Boshqa miqdor", `manual_amount?item_id=${item_id}`),
 
         edit_item_menu: (item_id) =>
             new InlineKeyboard()
@@ -94,6 +100,15 @@ const InlineKeyboards = {
             .text("Miqdorni o'zgartirish", `change_amount?item_id=${item_id}`)
             .row()
             .text("O'chirish", `delete_item?item_id=${item_id}`),
+
+        user_info_menu: (step) =>
+            new InlineKeyboard()
+            .text("Ismni o'zgartirish", `change_user_info?step=name`)
+            .text("Raqamni o'zgartirish", `change_user_info?step=phone`)
+            .row()
+            .text("Tilni o'zgartirish", `change_user_info?step=lang`)
+            .row()
+            .text("Orqaga", `back?step=${step}`),
 
         back: (value) => new InlineKeyboard().text("Orqaga", `back?step=${value}`),
     }

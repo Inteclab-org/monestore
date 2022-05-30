@@ -35,6 +35,46 @@ module.exports = class Controllers {
         })
     }
 
+    static async changeCredentials(ctx) {
+        try {
+            const {query} = require("query-string").parseUrl(ctx.callbackQuery.data)
+
+            switch (query.step) {
+                case "name":
+                    await ctx.reply(messages[ctx.session.user.lang].inputNameMsg, {
+                        parse_mode: "HTML"
+                    })
+                    break;
+                case "phone":
+                    await ctx.reply(messages[ctx.session.user.lang].telMsg, {
+                        parse_mode: "HTML",
+                        reply_markup: {
+                            resize_keyboard: true,
+                            keyboard: Keyboards[ctx.session.user.lang].share_phone.build()
+                        }
+                    })
+                    break;
+                case "lang":
+                    await ctx.reply(messages.startMsg, {
+                        parse_mode: "HTML",
+                        reply_markup: InlineKeyboards.select_language,
+                    })
+                    break;
+            
+                default:
+                    break;
+            }
+
+            ctx.session.step = `edit_user_info:${query.step}`
+            await Controllers.updateUserStep(ctx, ctx.session.step)
+
+            await ctx.answerCallbackQuery()
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     // LANGUAGE
 
     static async selectLanguage(ctx) {
@@ -116,6 +156,7 @@ module.exports = class Controllers {
                 let x = await ctx.reply(messages[ctx.session.user.lang].invalidNumberMsg, {
                     parse_mode: "HTML",
                 })
+                console.log(test);
                 // ctx.session.messages_to_delete.push(ctx.message.message_id)
                 // ctx.session.messages_to_delete.push(x.message_id)
                 return false
@@ -128,13 +169,6 @@ module.exports = class Controllers {
             }, {
                 where: {
                     telegram_id: ctx.msg.chat.id
-                }
-            })
-
-            await ctx.reply(messages[ctx.session.user.lang].regSuccessMsg, {
-                parse_mode: "HTML",
-                reply_markup: {
-                    remove_keyboard: true
                 }
             })
 
@@ -158,13 +192,13 @@ module.exports = class Controllers {
 
     static async openOrderMenu(ctx) {
 
-        if(ctx.session.step == "order"){
-            await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-                text: messages[ctx.session.user.lang].orderingMsg,
-                show_alert: true
-            })
-            return
-        }
+        // if(ctx.session.step == "order"){
+        //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+        //         text: messages[ctx.session.user.lang].orderingMsg,
+        //         show_alert: true
+        //     })
+        //     return
+        // }
 
         await ctx.editMessageText(messages[ctx.session.user.lang].orderFirstStep, {
             parse_mode: "HTML",
@@ -203,7 +237,7 @@ module.exports = class Controllers {
             \n<i>Tanlangan til:</i>  <b>${language}</b>`, {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
-                reply_markup: InlineKeyboards[ctx.session.user.lang].back("menu")
+                reply_markup: InlineKeyboards[ctx.session.user.lang].user_info_menu("menu")
             })
 
         await ctx.answerCallbackQuery()
@@ -225,7 +259,7 @@ module.exports = class Controllers {
 
     static async createOrderItems(ctx) {
         try {
-
+            
             if((!ctx.msg.photo && !ctx.msg.text) || (ctx.msg.text && !validURL(ctx.msg.text))){
                 await ctx.reply(messages[ctx.session.user.lang].invalidMessageMsg, {
                     parse_mode: "HTML"
@@ -288,13 +322,14 @@ module.exports = class Controllers {
                 return
             }
 
-            if(ctx.session.step != "order"){
-                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-                    text: messages[ctx.session.user.lang].notOrderingMsg,
-                    show_alert: true
-                })
-                return
-            }
+            // if(ctx.session.step != "order"){
+            //     console.log(ctx.session.step);
+            //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+            //         text: messages[ctx.session.user.lang].notOrderingMsg,
+            //         show_alert: true
+            //     })
+            //     return
+            // }
 
             let type = "text",
                 mType = "text"
@@ -342,13 +377,13 @@ module.exports = class Controllers {
                 return
             }
 
-            if(ctx.session.step != "order"){
-                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-                    text: messages[ctx.session.user.lang].notOrderingMsg,
-                    show_alert: true
-                })
-                return
-            }
+            // if(ctx.session.step != "order"  && ctx.session.step != "amount"){
+            //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+            //         text: messages[ctx.session.user.lang].notOrderingMsg,
+            //         show_alert: true
+            //     })
+            //     return
+            // }
 
             let type = "text", mType = "text"
             if (ctx.callbackQuery.message.photo) {
@@ -627,7 +662,7 @@ module.exports = class Controllers {
             ctx.session.current_order_id = order.id
 
             // buni o'zgartirish kerak!
-            await ctx.reply(`${messages[ctx.session.user.lang].verifiedMsg} \n Umumiy narx: 200000 \n To'lov rasmini (skrinshot) jo'nating`, {
+            await ctx.reply(`${messages[ctx.session.user.lang].verifiedMsg}`, {
                 parse_mode: "HTML",
                 reply_markup: {
                     remove_keyboard: true
@@ -692,7 +727,8 @@ module.exports = class Controllers {
 
             const updated_order = await orders.update({
                 payment_image_id: file_id,
-                status: 2
+                payment_pending: true,
+                status: 3
             }, {
                 where: {
                     id: ctx.session.current_order_id
@@ -705,20 +741,20 @@ module.exports = class Controllers {
                 parse_mode: "HTML"
             })
 
-            setTimeout(async () => {
-                await orders.update({
-                    payment_pending: false,
-                    is_paid: true,
-                    status: 3
-                }, {
-                    where: {
-                        id: ctx.session.current_order_id
-                    }
-                })
-                await ctx.reply("To'lov tasdiqlandi, haridingiz uchun tashakkur!", {
-                    parse_mode: "HTML"
-                })
-            }, 2000)
+            // setTimeout(async () => {
+            //     await orders.update({
+            //         payment_pending: false,
+            //         is_paid: true,
+            //         status: 3
+            //     }, {
+            //         where: {
+            //             id: ctx.session.current_order_id
+            //         }
+            //     })
+            //     await ctx.reply("To'lov tasdiqlandi, haridingiz uchun tashakkur!", {
+            //         parse_mode: "HTML"
+            //     })
+            // }, 2000)
         } catch (error) {
             console.log(error);
         }

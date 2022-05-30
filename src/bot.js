@@ -36,7 +36,8 @@ const {
     saveOrder,
     continueOrderProccess,
     getPaymentImage,
-    deleteItem
+    deleteItem,
+    changeCredentials
 } = require('./controllers/bot/controllers')
 const messages = require('./assets/messages')
 
@@ -65,8 +66,14 @@ async function tgBot(){
             }
         })
     }))
+
+    await bot.api.setMyCommands([
+        { command: "start", description: "Start the bot" },
+        // { command: "help", description: "Show help text" },
+        // { command: "settings", description: "Open settings" },
+      ]);
     
-    bot.command("start", async (ctx) => {
+    bot.command("start", async (ctx, next) => {
         const chat_id = ctx.msg.chat.id
     
         console.log(chat_id);
@@ -82,7 +89,8 @@ async function tgBot(){
             const role = chat_id === configs.ADMIN_ID ? 2 : 1
             user = await users.create({
                 telegram_id: chat_id,
-                role: role
+                role: role,
+                step: "language"
             })
             ctx.session.step = "language"
             await selectLanguage(ctx)
@@ -98,11 +106,13 @@ async function tgBot(){
             if (!user.full_name) {
                 ctx.session.step = "name"
                 await askName(ctx)
+                await updateUserStep(ctx, ctx.session.step)
                 return
             }
             if (!user.phone_number) {
                 ctx.session.step = "phone"
                 await askPhone(ctx)
+                await updateUserStep(ctx, ctx.session.step)
                 return
             }
         }
@@ -113,25 +123,25 @@ async function tgBot(){
             phone: user.phone_number,
         }
     
-        ctx.session.step = "menu"
+        ctx.session.step = user.step
         await sendMenu(ctx)
     })
     
     const router = new Router((ctx) => ctx.session.step)
     
-    bot.hears("Bekor qilish", async (ctx) => {
+    bot.hears(["Bekor qilish", "RU Bekor qilish"], async (ctx) => {
         await cancelOrderProccess(ctx)
         ctx.session.step = "menu"
         await sendMenu(ctx)
         await updateUserStep(ctx, ctx.session.step)
     })
-    bot.hears("Tasdiqlash", async (ctx) => {
+    bot.hears(["Tasdiqlash", "RU Tasdiqlash"], async (ctx) => {
         let v = await endOrderProccess(ctx)
         if (!v) return
         ctx.session.step = "verify"
         updateUserStep(ctx, ctx.session.step)
     })
-    bot.hears("Ha", async (ctx) => {
+    bot.hears(["Ha", "RU Ha"], async (ctx) => {
         switch (ctx.session.step) {
             case "verify":
                 await saveOrder(ctx)
@@ -142,7 +152,7 @@ async function tgBot(){
                 break;
         }
     })
-    bot.hears("Yo'q", async (ctx) => {
+    bot.hears(["Yo'q", "RU Yo'q"], async (ctx) => {
         switch (ctx.session.step) {
             case "verify":
                 await continueOrderProccess(ctx)
@@ -152,6 +162,10 @@ async function tgBot(){
             default:
                 break;
         }
+    })
+    
+    router.route("language", async (ctx) => {
+        await ctx.deleteMessage()
     })
     
     router.route("name", async (ctx) => {
@@ -164,6 +178,12 @@ async function tgBot(){
     router.route("phone", async (ctx) => {
         let p = await setPhone(ctx)
         if (!p) return
+        await ctx.reply(messages[ctx.session.user.lang].regSuccessMsg, {
+            parse_mode: "HTML",
+            reply_markup: {
+                remove_keyboard: true
+            }
+        })
         await sendMenu(ctx)
         ctx.session.step = "menu"
         await updateUserStep(ctx, ctx.session.step)
@@ -191,6 +211,26 @@ async function tgBot(){
         ctx.session.step = "menu"
         await updateUserStep(ctx, ctx.session.step)
     })
+
+    router.route(`edit_user_info:name`, async (ctx) => {
+        let a = await setName(ctx)
+        if (!a) return
+        await ctx.reply(messages[ctx.session.user.lang].nameChagedMsg)
+        ctx.session.step = "menu"
+        await updateUserStep(ctx, ctx.session.step)
+    })
+
+    router.route(`edit_user_info:phone`, async (ctx) => {
+        let a = await setPhone(ctx)
+        if (!a) return
+        await ctx.reply(messages[ctx.session.user.lang].phoneChagedMsg,{
+            reply_markup: {
+                remove_keyboard: true
+            }
+        })
+        ctx.session.step = "menu"
+        await updateUserStep(ctx, ctx.session.step)
+    })
     
     bot.on("callback_query:data", async (ctx) => {
     
@@ -202,6 +242,13 @@ async function tgBot(){
         switch (command) {
             case "set_language":
                 await setLanguage(ctx)
+                if(ctx.session.step == "edit_user_info:lang"){
+                    await ctx.deleteMessage()
+                    await ctx.reply(messages[ctx.session.user.lang].langChagedMsg)
+                    ctx.session.step = "menu"
+                    await updateUserStep(ctx, ctx.session.step)
+                    return
+                }
                 await askName(ctx)
                 ctx.session.step = "name"
                 await updateUserStep(ctx, ctx.session.step)
@@ -222,6 +269,9 @@ async function tgBot(){
                 break;
             case "settings":
                 await openSettingsMenu(ctx)
+                break;
+            case "change_user_info":
+                await changeCredentials(ctx)
                 break;
             case "back":
                 await backToMenu(ctx)
