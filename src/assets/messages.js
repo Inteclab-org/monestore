@@ -1,6 +1,6 @@
 const messages = {
+  startMsg: "Kerakli tilni tanlang \n Choose your language",
   uz: {
-    startMsg: "Kerakli tilni tanlang \n Choose your language",
     nameMsg: "<b>Ro'yxatdan o'tish uchun ismigizni va familiyangizni kiriting:</b>",
     telMsg: " <b>Telefon raqamingizni</b> yuboring",
     anotherTelMsg: "Qo'shimcha telefon raqam yuboring\n\nNamuna: 998901234567",
