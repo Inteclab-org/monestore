@@ -1,0 +1,6 @@
+statuses: 
+    1 - created
+    2 - payment image pending
+    3 - payment image sent
+    4 - payment unverified
+    5 - payment verified
