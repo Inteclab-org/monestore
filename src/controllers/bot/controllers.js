@@ -7,6 +7,7 @@ const Keyboards = require("../../assets/keyboards")
 const messages = require("../../assets/messages")
 const sequelize = require('../../db/db')
 const { validURL } = require("../../modules/regex_url")
+const { Sequelize } = require("sequelize")
 const {
     users,
     orders,
@@ -238,6 +239,58 @@ module.exports = class Controllers {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
                 reply_markup: InlineKeyboards[ctx.session.user.lang].user_info_menu("menu")
+            })
+
+        await ctx.answerCallbackQuery()
+    }
+
+    static async openMyOrdersMenu(ctx, offset) {
+
+        if (offset < 0) {
+            return
+        }
+
+        let user = await users.findOne({
+            where: {
+                telegram_id: ctx.msg.chat.id
+            },
+            raw: true
+        })
+
+        let ordersText = ""
+
+        const allOrders = await orders.findAndCountAll({
+            include: [
+                {
+                    model: order_items,
+                    attributes: ["id"]
+                }
+            ],
+            where: {
+                user_id: user.id
+            },
+            limit: 10,
+            offset: offset || 0,
+            order: [
+                ["createdAt", "DESC"]
+            ]
+        })
+
+        if (offset > allOrders.count) {
+            return
+        }
+        
+        for (const o of allOrders.rows) {
+            let isPaid = o.is_paid ? "to'langan✅" : "to'lanmagan❌"
+            let price = o.price ? o.price+" so'm" : "narx belgilanmagan"
+            ordersText += `ID: ${o.id}:  ${o.order_items.length} ta mahsulot, \n            ${price}, \n            ${isPaid} \n`
+        }
+
+        await ctx.editMessageText(
+            `Buyurtmalar: \n\n ${ordersText}`, {
+                parse_mode: "HTML",
+                message_id: ctx.callbackQuery.message.message_id,
+                reply_markup: InlineKeyboards.menu_switch(offset)
             })
 
         await ctx.answerCallbackQuery()

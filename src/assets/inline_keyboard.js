@@ -6,6 +6,11 @@ const InlineKeyboards = {
     select_language: new InlineKeyboard()
         .text("Uzbek", "set_language?value=uz")
         .text("Russian", "set_language?value=ru"),
+    menu_switch: (offset) => new InlineKeyboard()
+            .text("◀️", `prev?offset=${offset - 10}`)
+            .text("▶️", `next?offset=${offset + 10}`)
+            .row()
+            .text("Orqaga", `back?step=menu`),
     uz: {
         menu: new InlineKeyboard()
             .text("Buyurtma berish", "new_order")

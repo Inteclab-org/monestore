@@ -37,7 +37,8 @@ const {
     continueOrderProccess,
     getPaymentImage,
     deleteItem,
-    changeCredentials
+    changeCredentials,
+    openMyOrdersMenu
 } = require('./controllers/bot/controllers')
 const messages = require('./assets/messages')
 
@@ -47,7 +48,7 @@ const {
 
 const bot = new Bot(configs.TG_TOKEN);
 
-async function tgBot(){
+async function tgBot() {
     bot.use(session({
         initial: () => ({
             step: "idle",
@@ -67,24 +68,26 @@ async function tgBot(){
         })
     }))
 
-    await bot.api.setMyCommands([
-        { command: "start", description: "Start the bot" },
+    await bot.api.setMyCommands([{
+            command: "start",
+            description: "Start the bot"
+        },
         // { command: "help", description: "Show help text" },
         // { command: "settings", description: "Open settings" },
-      ]);
-    
+    ]);
+
     bot.command("start", async (ctx, next) => {
         const chat_id = ctx.msg.chat.id
-    
+
         console.log(chat_id);
-    
+
         let user = await users.findOne({
             where: {
                 telegram_id: chat_id
             },
             raw: true
         })
-    
+
         if (!user) {
             const role = chat_id === configs.ADMIN_ID ? 2 : 1
             user = await users.create({
@@ -95,9 +98,8 @@ async function tgBot(){
             ctx.session.step = "language"
             await selectLanguage(ctx)
             return
-        } 
-        else if (user && (!user.full_name || !user.phone_number)) {
-    
+        } else if (user && (!user.full_name || !user.phone_number)) {
+
             // if(!user.language_code){
             //     ctx.session.step = "language"
             //     await selectLanguage(ctx)
@@ -116,19 +118,19 @@ async function tgBot(){
                 return
             }
         }
-    
+
         ctx.session.user = {
             name: user.full_name,
             lang: user.language_code,
             phone: user.phone_number,
         }
-    
+
         ctx.session.step = user.step
         await sendMenu(ctx)
     })
-    
+
     const router = new Router((ctx) => ctx.session.step)
-    
+
     bot.hears(["Bekor qilish", "RU Bekor qilish"], async (ctx) => {
         await cancelOrderProccess(ctx)
         ctx.session.step = "menu"
@@ -163,18 +165,18 @@ async function tgBot(){
                 break;
         }
     })
-    
+
     router.route("language", async (ctx) => {
         await ctx.deleteMessage()
     })
-    
+
     router.route("name", async (ctx) => {
         await setName(ctx)
         await askPhone(ctx)
         ctx.session.step = "phone"
         await updateUserStep(ctx, ctx.session.step)
     })
-    
+
     router.route("phone", async (ctx) => {
         let p = await setPhone(ctx)
         if (!p) return
@@ -188,23 +190,23 @@ async function tgBot(){
         ctx.session.step = "menu"
         await updateUserStep(ctx, ctx.session.step)
     })
-    
+
     router.route("menu", async (ctx) => {
         await sendMenu(ctx)
     })
-    
+
     router.route("order", async (ctx) => {
         let o = await createOrderItems(ctx)
         if (!o) return
     })
-    
+
     router.route("amount", async (ctx) => {
         let a = await setManualAmount(ctx)
         if (!a) return
         ctx.session.step = "order"
         await updateUserStep(ctx, ctx.session.step)
     })
-    
+
     router.route("payment", async (ctx) => {
         let a = await getPaymentImage(ctx)
         if (!a) return
@@ -223,7 +225,7 @@ async function tgBot(){
     router.route(`edit_user_info:phone`, async (ctx) => {
         let a = await setPhone(ctx)
         if (!a) return
-        await ctx.reply(messages[ctx.session.user.lang].phoneChagedMsg,{
+        await ctx.reply(messages[ctx.session.user.lang].phoneChagedMsg, {
             reply_markup: {
                 remove_keyboard: true
             }
@@ -231,18 +233,18 @@ async function tgBot(){
         ctx.session.step = "menu"
         await updateUserStep(ctx, ctx.session.step)
     })
-    
+
     bot.on("callback_query:data", async (ctx) => {
-    
+
         const {
             url: command,
             query
         } = require('query-string').parseUrl(ctx.callbackQuery.data)
-    
+
         switch (command) {
             case "set_language":
                 await setLanguage(ctx)
-                if(ctx.session.step == "edit_user_info:lang"){
+                if (ctx.session.step == "edit_user_info:lang") {
                     await ctx.deleteMessage()
                     await ctx.reply(messages[ctx.session.user.lang].langChagedMsg)
                     ctx.session.step = "menu"
@@ -259,7 +261,15 @@ async function tgBot(){
                 await updateUserStep(ctx, ctx.session.step)
                 break;
             case "my_orders":
-                await openMyOrdersMenu(ctx)
+                await openMyOrdersMenu(ctx, 0)
+                break;
+            case "next":
+                await openMyOrdersMenu(ctx, query.offset)
+                await ctx.answerCallbackQuery()
+                break;
+            case "prev":
+                await openMyOrdersMenu(ctx, query.offset)
+                await ctx.answerCallbackQuery()
                 break;
             case "current_order":
                 await showCurrentOrder(ctx)
@@ -278,7 +288,7 @@ async function tgBot(){
                 ctx.session.step = "menu"
                 await updateUserStep(ctx, ctx.session.step)
                 break;
-    
+
             case "set_size":
                 await setItemSize(ctx)
                 break
@@ -299,12 +309,12 @@ async function tgBot(){
             case "delete_item":
                 await deleteItem(ctx)
                 break
-    
+
             default:
                 break;
         }
     })
-    
+
     bot.catch((err) => {
         const ctx = err.ctx;
         console.error(`Error while handling update ${ctx.update.update_id}:`);
@@ -317,7 +327,7 @@ async function tgBot(){
             console.error("Unknown error:", e);
         }
     });
-    
+
     bot.use(router)
     bot.start()
 }
