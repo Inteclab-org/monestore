@@ -272,7 +272,7 @@ module.exports = class Controllers {
             limit: 10,
             offset: offset || 0,
             order: [
-                ["createdAt", "DESC"]
+                ["created_at", "DESC"]
             ]
         })
 

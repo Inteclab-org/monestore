@@ -6,7 +6,8 @@ const configs = require('../config')
 const modelDefiners = [
     require('./models/users/users'),
     require('./models/orders/orders'),
-    require('./models/orders/order_items')
+    require('./models/orders/order_items'),
+    require('./models/users/admin_users')
 ]
 
 const sequelize = new Sequelize(configs.DB_CONNECTION_URL, {
