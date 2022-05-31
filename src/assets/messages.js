@@ -1,9 +1,9 @@
 const messages = {
   startMsg: "Kerakli tilni tanlang \n Choose your language",
   uz: {
-    nameMsg: "Ro'yxatdan o'tish uchun ismigizni va familiyangizni kiriting:",
-    inputNameMsg: "Ismigizni kiriting",
-    telMsg: "Telefon raqamingizni</b> yuboring:\n\nNamuna: +998901234567",
+    nameMsg: "<b>Ro'yxatdan o'tish uchun ismigizni va familiyangizni kiriting:</b>",
+    inputNameMsg: "<b>Ismigizni kiriting</b>",
+    telMsg: "<b>Telefon raqamingizni</b> yuboring:\n\nNamuna: <i>+998901234567</i>",
     anotherTelMsg: "Qo'shimcha telefon raqam yuboring\n\nNamuna: 998901234567",
     incTelMsg: "Iltimos raqamni to'gri kiriting!",
     regSuccessMsg: "Ro'yhatdan muvaffaqiyatli o'tdingiz!",
@@ -35,9 +35,9 @@ const messages = {
     orderInstructions: "Mahsulotlarni yuborib bo'lgach buyurtmani ro'yxatdan o'tkazish uchun <b>Tasdiqlash</b> tugmasini bosing!\n<b>Bekor qilish</b> tugmasi esa jarayonni to'xtatadi!\n\nBir mahsulotni turli xil o'lchamda va turli miqdorda tanlash uchun shu mahsulotni ikki marta yuboring va har birida kerakli o'lchamlar va miqdorni tanlang.",
   },
   ru: {
-    nameMsg: "RU Ro'yxatdan o'tish uchun ismigizni kiriting:",
-    inputNameMsg: "RU Ismigizni kiriting",
-    telMsg: "RU Telefon raqamingizni yuboring:\n\nNamuna: +998901234567",
+    nameMsg: "<b>RU Ro'yxatdan o'tish uchun ismigizni kiriting:</b>",
+    inputNameMsg: "<b>RU Ismigizni kiriting</b>",
+    telMsg: " <b>RU Telefon raqamingizni</b> yuboring:\n\nNamuna: <i>+998901234567</i>",
     anotherTelMsg: "RU Qo'shimcha telefon raqam yuboring\n\nNamuna: 998901234567",
     incTelMsg: "RU Iltimos raqamni to'gri kiriting!",
     regSuccessMsg: "RU Ro'yhatdan muvaffaqiyatli o'tdingiz!",
