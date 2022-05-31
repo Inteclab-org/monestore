@@ -131,6 +131,63 @@ class UsersController{
             next(error)
         }
     }
+
+    static async GetOne(req, res, next) {
+        try {
+            const { params } = req
+
+            const user = await users.findOne({
+                where: {
+                    id: params.id
+                }
+            })
+
+            if (!user) {
+                throw new res.error(400, "User not found!")
+            }
+
+            res.status(200).json({
+                ok: true,
+                data: {
+                    user
+                }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    static async GetUserOrders(req, res, next) {
+        try {
+            const { params } = req
+
+            const user = await users.findOne({
+                where: {
+                    id: params.id
+                },
+                raw: true
+            })
+
+            if (!user) {
+                throw new res.error(400, "User not found!")
+            }
+
+            const allUserOrders = await orders.findAndCountAll({
+                where: {
+                    user_id: user.id
+                }
+            })
+
+            res.status(200).json({
+                ok: true,
+                data: {
+                    orders: allUserOrders
+                }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 } 
 
 module.exports = UsersController
