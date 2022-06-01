@@ -23,6 +23,8 @@ class UsersController{
                 raw: true
             })
 
+            console.log(user);
+
             if (!user) {
                 res.status(400).json({
                     ok: false,
