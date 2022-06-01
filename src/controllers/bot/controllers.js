@@ -202,7 +202,7 @@ module.exports = class Controllers {
     static async openOrderMenu(ctx) {
         const user = await users.findOne({
             where: {
-                telegram_id: ctx.message.chat.id
+                telegram_id: ctx.callbackQuery.message.chat.id
             },
             raw: true
         })
