@@ -218,7 +218,7 @@ module.exports = class Controllers {
                 text: messages[ctx.session.user.lang].notDeliveredMsg
             })
         }
-        if(!current_order.is_paid){
+        if(current_order && !current_order.is_paid){
             await ctx.answerCallbackQuery(ctx.callbackQuery.id, {
                 text: messages[ctx.session.user.lang].notPaidMsg
             })
