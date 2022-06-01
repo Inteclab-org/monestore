@@ -25,5 +25,8 @@ module.exports = async (sequelize, DataTypes) => {
         size: {
             type: DataTypes.STRING(5),
         }
-    })
+    }, {
+        updatedAt: 'updated_at',
+        createdAt: 'created_at'
+      })
 }

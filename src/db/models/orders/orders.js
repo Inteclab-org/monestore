@@ -38,5 +38,8 @@ module.exports = async (sequelize, DataTypes) => {
             defaultValue: 1
         },
 
-    })
+    }, {
+        updatedAt: 'updated_at',
+        createdAt: 'created_at'
+      })
 }
