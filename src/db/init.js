@@ -5,7 +5,14 @@ const sequelize = require("./db");
 const { users, admin_users } = sequelize.models
 
 module.exports.init = async function() {
-    if(await users.count() == 0){
+
+    const admins = await users.count({
+        where:{
+            role: 2
+        }
+    })
+
+    if(await admins == 0){
         const user = await users.create({
             full_name: "admin",
             language_code: "uz",

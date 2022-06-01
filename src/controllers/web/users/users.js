@@ -28,18 +28,21 @@ class UsersController{
                     ok: false,
                     message: "User not found! Check ID!"
                 })
+                return
             }
             if (user.role != 2) {
                 res.status(400).json({
                     ok: false,
                     message: "Not an admin! Access denied!"
                 })
+                return
             }
             if (!compareCrypt(body.password, user["admin_users.password"])) {
                 res.status(400).json({
                     ok: false,
                     message: "Incorrect ID or password!"
                 })
+                return
             }
 
             req.user = {
@@ -143,6 +146,34 @@ class UsersController{
             })
 
             if (!user) {
+                throw new res.error(400, "User not found!")
+            }
+
+            res.status(200).json({
+                ok: true,
+                data: {
+                    user
+                }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    static async Profile(req, res, next) {
+        try {
+
+            const user = await users.findOne({
+                where: {
+                    id: req.user.id
+                }
+            })
+
+            if (!user) {
+                res.status(200).json({
+                    ok: false,
+                    message: "User not found!"
+                })
                 throw new res.error(400, "User not found!")
             }
 

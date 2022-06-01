@@ -26,14 +26,26 @@ const {
   
       const decodedToken = verify(authToken, config.JWT_KEY);
   
-      if(!decodedToken) throw new res.error(400, "Unauthorized!")
+      if(!decodedToken) {
+        res.status(400).json({
+          ok: false,
+          message: "Unathorized!"
+        })
+        throw new res.error(400, "Unauthorized!")
+      }
       
-      const user = await users.findByPk(decodedToken.user_id, {
+      const user = await users.findByPk(decodedToken.id, {
         attributes: ["telegram_id", "full_name", "language_code", "phone_number", "role"],
         raw: true
       })
   
-      if (!user) throw new res.error(401, "User does not exist")
+      if (!user) {
+        res.status(400).json({
+          ok: false,
+          message: "User does not exist!"
+        })
+        throw new res.error(401, "User does not exist")
+      }
 
       req.user = user; 
       req.decodedToken = decodedToken;
@@ -41,8 +53,9 @@ const {
       next()
   
     } catch (error) {
+      console.log(error);
       res.status(400).json({
-        success: false,
+        ok: false,
         message: "Unathorized!"
       })
       return
