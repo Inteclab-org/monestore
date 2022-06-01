@@ -38,9 +38,12 @@ const {
     getPaymentImage,
     deleteItem,
     changeCredentials,
-    openMyOrdersMenu
+    openMyOrdersMenu,
+    sendOrders,
+    sendCurrentOrder
 } = require('./controllers/bot/controllers')
 const messages = require('./assets/messages')
+const InlineKeyboards = require('./assets/inline_keyboard')
 
 const {
     users
@@ -53,11 +56,14 @@ async function tgBot() {
         initial: () => ({
             step: "idle",
             user: {
+                id: null,
+                tgid: null,
                 name: null,
                 lang: "uz",
                 phone: null,
             },
             messages_to_delete: [],
+            last_sent_link_message: null,
             order: {},
             editing_item: {
                 item_id: null,
@@ -95,16 +101,18 @@ async function tgBot() {
                 role: role,
                 step: "language"
             })
+            ctx.session.user.tgid = chat_id
+            ctx.session.user.id = user.id
             ctx.session.step = "language"
             await selectLanguage(ctx)
             return
-        } else if (user && (!user.full_name || !user.phone_number)) {
+        } else if (user) {
 
-            // if(!user.language_code){
-            //     ctx.session.step = "language"
-            //     await selectLanguage(ctx)
-            //     return
-            // }
+            if(!user.language_code){
+                ctx.session.step = "language"
+                await selectLanguage(ctx)
+                return
+            }
             if (!user.full_name) {
                 ctx.session.step = "name"
                 await askName(ctx)
@@ -120,6 +128,8 @@ async function tgBot() {
         }
 
         ctx.session.user = {
+            tgid: chat_id,
+            id: user.id,
             name: user.full_name,
             lang: user.language_code,
             phone: user.phone_number,
@@ -217,7 +227,10 @@ async function tgBot() {
     router.route(`edit_user_info:name`, async (ctx) => {
         let a = await setName(ctx)
         if (!a) return
-        await ctx.reply(messages[ctx.session.user.lang].nameChagedMsg)
+        await ctx.reply(messages[ctx.session.user.lang].nameChagedMsg(ctx.session.user.name),{
+            parse_mode: "HTML",
+            reply_markup: InlineKeyboards[ctx.session.user.lang].back("menu")
+        })
         ctx.session.step = "menu"
         await updateUserStep(ctx, ctx.session.step)
     })
@@ -225,10 +238,9 @@ async function tgBot() {
     router.route(`edit_user_info:phone`, async (ctx) => {
         let a = await setPhone(ctx)
         if (!a) return
-        await ctx.reply(messages[ctx.session.user.lang].phoneChagedMsg, {
-            reply_markup: {
-                remove_keyboard: true
-            }
+        await ctx.reply(messages[ctx.session.user.lang].phoneChagedMsg(ctx.session.user.phone), {
+            parse_mode: "HTML",
+            reply_markup: InlineKeyboards[ctx.session.user.lang].back("menu")
         })
         ctx.session.step = "menu"
         await updateUserStep(ctx, ctx.session.step)
@@ -245,8 +257,13 @@ async function tgBot() {
             case "set_language":
                 await setLanguage(ctx)
                 if (ctx.session.step == "edit_user_info:lang") {
-                    await ctx.deleteMessage()
-                    await ctx.reply(messages[ctx.session.user.lang].langChagedMsg)
+                    await ctx.api.editMessageText(
+                        ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id,
+                        messages[ctx.session.user.lang].langChagedMsg(ctx.session.user.lang),
+                    {
+                        parse_mode: "HTML",
+                        reply_markup: InlineKeyboards[ctx.session.user.lang].back("menu")
+                    })
                     ctx.session.step = "menu"
                     await updateUserStep(ctx, ctx.session.step)
                     return
@@ -264,18 +281,16 @@ async function tgBot() {
                 await openMyOrdersMenu(ctx, 0)
                 break;
             case "next":
-                await openMyOrdersMenu(ctx, query.offset)
-                await ctx.answerCallbackQuery()
+                await sendOrders(ctx, query.offset)
                 break;
             case "prev":
-                await openMyOrdersMenu(ctx, query.offset)
-                await ctx.answerCallbackQuery()
+                await sendOrders(ctx, query.offset)
                 break;
             case "current_order":
-                await showCurrentOrder(ctx)
+                await sendCurrentOrder(ctx)
                 break;
             case "all_orders":
-                await showAllOrders(ctx)
+                await sendOrders(ctx, 0)
                 break;
             case "settings":
                 await openSettingsMenu(ctx)
@@ -285,8 +300,8 @@ async function tgBot() {
                 break;
             case "back":
                 await backToMenu(ctx)
-                ctx.session.step = "menu"
-                await updateUserStep(ctx, ctx.session.step)
+                // ctx.session.step = "menu"
+                // await updateUserStep(ctx, ctx.session.step)
                 break;
 
             case "set_size":

@@ -6,8 +6,12 @@ const InlineKeyboards = require("../../assets/inline_keyboard")
 const Keyboards = require("../../assets/keyboards")
 const messages = require("../../assets/messages")
 const sequelize = require('../../db/db')
-const { validURL } = require("../../modules/regex_url")
-const { Sequelize } = require("sequelize")
+const {
+    validURL
+} = require("../../modules/regex_url")
+const {
+    Sequelize
+} = require("sequelize")
 const {
     users,
     orders,
@@ -38,30 +42,36 @@ module.exports = class Controllers {
 
     static async changeCredentials(ctx) {
         try {
-            const {query} = require("query-string").parseUrl(ctx.callbackQuery.data)
+            const {
+                query
+            } = require("query-string").parseUrl(ctx.callbackQuery.data)
 
             switch (query.step) {
                 case "name":
-                    await ctx.reply(messages[ctx.session.user.lang].inputNameMsg, {
-                        parse_mode: "HTML"
-                    })
+                    await editMessage(
+                        ctx, ctx.callbackQuery.message.message_id,
+                        "text", messages[ctx.session.user.lang].inputNameMsg, {
+                            inline_keyboard: []
+                        }
+                    )
                     break;
                 case "phone":
-                    await ctx.reply(messages[ctx.session.user.lang].telMsg, {
-                        parse_mode: "HTML",
-                        reply_markup: {
-                            resize_keyboard: true,
-                            keyboard: Keyboards[ctx.session.user.lang].share_phone.build()
+                    await editMessage(
+                        ctx, ctx.callbackQuery.message.message_id,
+                        "text", messages[ctx.session.user.lang].telMsg, {
+                            inline_keyboard: []
                         }
-                    })
+                    )
                     break;
                 case "lang":
-                    await ctx.reply(messages.startMsg, {
-                        parse_mode: "HTML",
-                        reply_markup: InlineKeyboards.select_language,
-                    })
+                    await editMessage(
+                        ctx, ctx.callbackQuery.message.message_id,
+                        "text", messages.startMsg, {
+                            inline_keyboard: InlineKeyboards.select_language.inline_keyboard
+                        }
+                    )
                     break;
-            
+
                 default:
                     break;
             }
@@ -109,11 +119,9 @@ module.exports = class Controllers {
     // NAME
 
     static async askName(ctx) {
-        await ctx.editMessageText(messages[ctx.session.user.lang].nameMsg, {
-            parse_mode: "HTML",
-            reply_markup: {
-                inline_keyboard: []
-            }
+        await ctx.deleteMessage()
+        await ctx.reply(messages[ctx.session.user.lang].nameMsg, {
+            parse_mode: "HTML"
         })
     }
 
@@ -184,37 +192,53 @@ module.exports = class Controllers {
 
     // MENU
 
-    static async sendMenu(ctx) {
-        await ctx.reply(messages[ctx.session.user.lang].menuMsg, {
+    static async sendMenu(ctx, additional) {
+        await ctx.reply((additional ? additional + "\n" : '') + messages[ctx.session.user.lang].menuMsg, {
             parse_mode: "HTML",
             reply_markup: InlineKeyboards[ctx.session.user.lang].menu
         })
     }
 
     static async openOrderMenu(ctx) {
-
-        // if(ctx.session.step == "order"){
-        //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-        //         text: messages[ctx.session.user.lang].orderingMsg,
-        //         show_alert: true
-        //     })
-        //     return
-        // }
-
-        await ctx.editMessageText(messages[ctx.session.user.lang].orderFirstStep, {
-            parse_mode: "HTML",
-            message_id: ctx.callbackQuery.message.message_id,
-            reply_markup: InlineKeyboards[ctx.session.user.lang].order_first_step_menu
+        const user = await users.findByPk(ctx.session.user.id,{
+            include: [
+                {
+                    model: orders
+                }
+            ],
+            raw: true
         })
 
-        await ctx.reply(messages[ctx.session.user.lang].orderInstructions, {
+        if(!user["orders.is_paid"]){
+            await ctx.answerCallbackQuery(ctx.callbackQuery.id, {
+                text: messages[ctx.session.user.lang].notPaidMsg
+            })
+        }
+        if(user.current_order_id){
+            await ctx.answerCallbackQuery(ctx.callbackQuery.id, {
+                text: messages[ctx.session.user.lang].notDeliveredMsg
+            })
+        }
+
+        if (ctx.session.step == "order") {
+            // await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+            //     text: messages[ctx.session.user.lang].orderingMsg,
+            // })
+            // return
+            if (ctx.session.last_sent_link_message) {
+                await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.session.last_sent_link_message)
+            }
+        }
+
+        let x = await ctx.reply(messages[ctx.session.user.lang].orderFirstStep, {
             parse_mode: "HTML",
+            message_id: ctx.callbackQuery.message.message_id,
             reply_markup: {
                 resize_keyboard: true,
                 keyboard: Keyboards[ctx.session.user.lang].verify_order.build()
             }
         })
-
+        ctx.session.last_sent_link_message = x.message_id
         await ctx.answerCallbackQuery()
     }
 
@@ -244,9 +268,21 @@ module.exports = class Controllers {
         await ctx.answerCallbackQuery()
     }
 
-    static async openMyOrdersMenu(ctx, offset) {
+    static async openMyOrdersMenu(ctx) {
+
+        await ctx.editMessageText(messages[ctx.session.user.lang].chooseSectionMsg, {
+            parse_mode: "HTML",
+            message_id: ctx.callbackQuery.message.message_id,
+            reply_markup: InlineKeyboards[ctx.session.user.lang].order_sections_menu("menu")
+        })
+
+        await ctx.answerCallbackQuery()
+    }
+
+    static async sendOrders(ctx, offset) {
 
         if (offset < 0) {
+            await ctx.answerCallbackQuery()
             return
         }
 
@@ -260,49 +296,102 @@ module.exports = class Controllers {
         let ordersText = ""
 
         const allOrders = await orders.findAndCountAll({
-            include: [
-                {
-                    model: order_items,
-                    attributes: ["id"]
-                }
-            ],
+            include: [{
+                model: order_items,
+                attributes: ["id"]
+            }],
             where: {
                 user_id: user.id
             },
-            limit: 10,
+            limit: 1,
             offset: offset || 0,
             order: [
                 ["created_at", "DESC"]
             ]
         })
 
-        if (offset > allOrders.count) {
+        console.log(offset);
+
+        if (offset >= allOrders.count) {
+            await ctx.answerCallbackQuery()
             return
         }
-        
+
         for (const o of allOrders.rows) {
-            let isPaid = o.is_paid ? "to'langan✅" : "to'lanmagan❌"
-            let price = o.price ? o.price+" so'm" : "narx belgilanmagan"
-            ordersText += `ID: ${o.id}:  ${o.order_items.length} ta mahsulot, \n            ${price}, \n            ${isPaid} \n`
+            let isPaid = o.is_paid ? "qilingan✅" : "qilinmagan❌"
+            let price = o.price ? o.price + " so'm" : "belgilanishi kutilmoqda 🕢"
+            ordersText += 
+            `🆔: ${o.id}\n\n🛍<i>Mahsulotlar soni</i>: <b>${o.order_items.length}</b> ta\n💲<i>Narx</i>: <b>${price}</b>\n💵<i>To'lov</i> <b>${isPaid}</b>`
         }
 
         await ctx.editMessageText(
             `Buyurtmalar: \n\n ${ordersText}`, {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
-                reply_markup: InlineKeyboards.menu_switch(offset)
+                reply_markup: InlineKeyboards.menu_switch(offset, "orders")
+            })
+
+        await ctx.answerCallbackQuery()
+    }
+
+    static async sendCurrentOrder(ctx) {
+
+        let user = await users.findOne({
+            where: {
+                telegram_id: ctx.msg.chat.id
+            },
+            raw: true
+        })
+
+        let ordersText = ""
+
+        const o = await orders.findOne({
+            include: [{
+                model: order_items,
+                attributes: ["id"]
+            }],
+            where: {
+                id: user.current_order_id,
+                user_id: user.id,
+            }
+        })
+
+       if (o) {
+            let isPaid = o.is_paid ? "qilingan ✅" : "qilinmagan ❌"
+            let price = o.price ? o.price + " so'm" : "belgilanishi kutilmoqda 🕢"
+            ordersText += `🆔: ${o.id}\n\n🛍<i>Mahsulotlar soni</i>: <b>${o.order_items.length}</b> ta\n💲<i>Narx</i>: <b>${price}</b>\n💵<i>To'lov</i> <b>${isPaid}</b>`
+       }
+
+        await ctx.editMessageText(
+            `Hozirgi buyurtma: \n\n ${ordersText}`, {
+                parse_mode: "HTML",
+                message_id: ctx.callbackQuery.message.message_id,
+                reply_markup: InlineKeyboards[ctx.session.user.lang].back("orders")
             })
 
         await ctx.answerCallbackQuery()
     }
 
     static async backToMenu(ctx) {
-
-        await ctx.editMessageText(messages[ctx.session.user.lang].menuMsg, {
-            parse_mode: "HTML",
-            message_id: ctx.callbackQuery.message.message_id,
-            reply_markup: InlineKeyboards[ctx.session.user.lang].menu
-        })
+        const {
+            query
+        } = require("query-string").parseUrl(ctx.callbackQuery.data)
+        switch (query.step) {
+            case "menu":
+                await ctx.editMessageText(messages[ctx.session.user.lang].menuMsg, {
+                    parse_mode: "HTML",
+                    message_id: ctx.callbackQuery.message.message_id,
+                    reply_markup: InlineKeyboards[ctx.session.user.lang].menu
+                })
+                break;
+        
+            case "orders":
+                Controllers.openMyOrdersMenu(ctx)
+                break;
+        
+            default:
+                break;
+        }
 
         await ctx.answerCallbackQuery()
     }
@@ -312,8 +401,8 @@ module.exports = class Controllers {
 
     static async createOrderItems(ctx) {
         try {
-            
-            if((!ctx.msg.photo && !ctx.msg.text) || (ctx.msg.text && !validURL(ctx.msg.text))){
+
+            if ((!ctx.msg.photo && !ctx.msg.text) || (ctx.msg.text && !validURL(ctx.msg.text))) {
                 await ctx.reply(messages[ctx.session.user.lang].invalidMessageMsg, {
                     parse_mode: "HTML"
                 })
@@ -325,7 +414,7 @@ module.exports = class Controllers {
             if (ctx.msg.photo) {
                 type = "photo"
             }
-            
+
             let order_length = Object.keys(ctx.session.order).length + 1
 
             ctx.session.order[order_length] = {}
@@ -367,7 +456,7 @@ module.exports = class Controllers {
                 query
             } = require('query-string').parseUrl(ctx.callbackQuery.data)
 
-            if(ctx.session.step == "verify"){
+            if (ctx.session.step == "verify") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].isVerifyingMsg,
                     show_alert: true
@@ -422,7 +511,7 @@ module.exports = class Controllers {
                 query
             } = require('query-string').parseUrl(ctx.callbackQuery.data)
 
-            if(ctx.session.step == "verify"){
+            if (ctx.session.step == "verify") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].isVerifyingMsg,
                     show_alert: true
@@ -438,10 +527,11 @@ module.exports = class Controllers {
             //     return
             // }
 
-            let type = "text", mType = "text"
+            let type = "text",
+                mType = "text"
             if (ctx.callbackQuery.message.photo) {
                 type = "photo",
-                mType = "caption"
+                    mType = "caption"
             }
 
             let text = ctx.callbackQuery.message[mType] + `\nMiqdor: ${query.value}\n\n✅`
@@ -491,7 +581,7 @@ module.exports = class Controllers {
                 return
             }
 
-            if(ctx.session.step == "verfiy"){
+            if (ctx.session.step == "verfiy") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].isVerifyingMsg,
                     show_alert: true
@@ -499,7 +589,7 @@ module.exports = class Controllers {
                 return
             }
 
-            if(ctx.session.step != "order"){
+            if (ctx.session.step != "order") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].notOrderingMsg,
                     show_alert: true
@@ -572,7 +662,7 @@ module.exports = class Controllers {
                 query
             } = require('query-string').parseUrl(ctx.callbackQuery.data)
 
-            if(ctx.session.step == "verfiy"){
+            if (ctx.session.step == "verfiy") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].isVerifyingMsg,
                     show_alert: true
@@ -580,7 +670,7 @@ module.exports = class Controllers {
                 return
             }
 
-            if(ctx.session.step != "order"){
+            if (ctx.session.step != "order") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].notOrderingMsg,
                     show_alert: true
@@ -588,10 +678,11 @@ module.exports = class Controllers {
                 return
             }
 
-            let type = "text", mType = "text"
+            let type = "text",
+                mType = "text"
             if (ctx.callbackQuery.message.photo) {
                 type = "photo",
-                mType = "caption"
+                    mType = "caption"
             }
 
             let text = ctx.callbackQuery.message[mType].replace("✅", "✏️")
@@ -648,7 +739,7 @@ module.exports = class Controllers {
                         })
                         return false
                     }
-                    
+
                     for (const k in element) {
                         if (element.hasOwnProperty(k)) {
                             const e = element[k];
@@ -695,7 +786,7 @@ module.exports = class Controllers {
 
             await users.update({
                 current_order_id: order.id
-            },{
+            }, {
                 where: {
                     id: user.id
                 }
@@ -703,7 +794,7 @@ module.exports = class Controllers {
 
             for (const key in ordersObj) {
                 if (ordersObj.hasOwnProperty(key)) {
-                    const element = ordersObj[key];            
+                    const element = ordersObj[key];
                     const order_item = await order_items.create({
                         ...element,
                         order_id: order.id
@@ -736,7 +827,7 @@ module.exports = class Controllers {
             }
         })
     }
-    
+
     static async cancelOrderProccess(ctx) {
         try {
             ctx.session.order = {}
@@ -753,9 +844,9 @@ module.exports = class Controllers {
         }
     }
 
-    static async getPaymentImage(ctx){
+    static async getPaymentImage(ctx) {
         try {
-            if(!ctx.msg.photo){
+            if (!ctx.msg.photo) {
                 await ctx.reply("Rasm jo'natishingiz kerak!", {
                     parse_mode: "HTML"
                 })
@@ -768,7 +859,7 @@ module.exports = class Controllers {
                 }
             })
 
-            if(order && order.payment_pending){
+            if (order && order.payment_pending) {
                 await ctx.reply("Avvalgi to'lov hali adminlar tomonidan ko'rib chiqilmagan. Iltimos, javobni kuting.", {
                     parse_mode: "HTML"
                 })
@@ -788,7 +879,7 @@ module.exports = class Controllers {
                 }
             })
 
-            if(!updated_order[0]) return false
+            if (!updated_order[0]) return false
 
             await ctx.reply("To'lov tasdiqlanishini kuting...", {
                 parse_mode: "HTML"
@@ -813,7 +904,7 @@ module.exports = class Controllers {
         }
     }
 
-    static async deleteItem(ctx){
+    static async deleteItem(ctx) {
         try {
             const {
                 query

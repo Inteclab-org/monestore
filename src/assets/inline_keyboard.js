@@ -6,11 +6,11 @@ const InlineKeyboards = {
     select_language: new InlineKeyboard()
         .text("Uzbek", "set_language?value=uz")
         .text("Russian", "set_language?value=ru"),
-    menu_switch: (offset) => new InlineKeyboard()
-            .text("◀️", `prev?offset=${offset - 10}`)
-            .text("▶️", `next?offset=${offset + 10}`)
+    menu_switch: (offset, step) => new InlineKeyboard()
+            .text("◀️", `prev?offset=${Number(offset) - 1}`)
+            .text("▶️", `next?offset=${Number(offset) + 1}`)
             .row()
-            .text("Orqaga", `back?step=menu`),
+            .text("Orqaga", `back?step=${step}`),
     uz: {
         menu: new InlineKeyboard()
             .text("Buyurtma berish", "new_order")
@@ -59,6 +59,12 @@ const InlineKeyboards = {
             .text("Raqamni o'zgartirish", `change_user_info?step=phone`)
             .row()
             .text("Tilni o'zgartirish", `change_user_info?step=lang`)
+            .row()
+            .text("Orqaga", `back?step=${step}`),
+        order_sections_menu: (step) =>
+            new InlineKeyboard()
+            .text("Barchasi", `all_orders`)
+            .text("Hozirgi", `current_order`)
             .row()
             .text("Orqaga", `back?step=${step}`),
 
@@ -112,6 +118,13 @@ const InlineKeyboards = {
             .text("Raqamni o'zgartirish", `change_user_info?step=phone`)
             .row()
             .text("Tilni o'zgartirish", `change_user_info?step=lang`)
+            .row()
+            .text("Orqaga", `back?step=${step}`),
+
+        order_sections_menu: (step) =>
+            new InlineKeyboard()
+            .text("Barchasi", `all_orders`)
+            .text("Hozirgi", `current_order`)
             .row()
             .text("Orqaga", `back?step=${step}`),
 
