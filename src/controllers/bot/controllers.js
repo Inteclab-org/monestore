@@ -200,7 +200,10 @@ module.exports = class Controllers {
     }
 
     static async openOrderMenu(ctx) {
-        const user = await users.findByPk(ctx.session.user.id,{
+        const user = await users.findOne({
+            where: {
+                telegram_id: ctx.message.chat.id
+            },
             raw: true
         })
 
