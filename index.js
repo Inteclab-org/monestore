@@ -1,6 +1,7 @@
 const tgBot = require("./src/bot");
 const configs = require("./src/config");
 const sequelize = require("./src/db/db");
+const { init } = require("./src/db/init");
 const app = require("./src/server");
 ;
 (async () => {
@@ -8,7 +9,8 @@ const app = require("./src/server");
         await sequelize.sync({
             force: false
         })
-        // await sequelize.sync()
+        await init()
+        await sequelize.sync()
 
     } catch (error) {
         console.log("Sequelize error:", error);
