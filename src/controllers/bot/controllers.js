@@ -201,22 +201,23 @@ module.exports = class Controllers {
 
     static async openOrderMenu(ctx) {
         const user = await users.findByPk(ctx.session.user.id,{
-            include: [
-                {
-                    model: orders
-                }
-            ],
             raw: true
         })
 
-        if(!user["orders.is_paid"]){
-            await ctx.answerCallbackQuery(ctx.callbackQuery.id, {
-                text: messages[ctx.session.user.lang].notPaidMsg
-            })
-        }
+        const current_order = await orders.findOne({
+            where: {
+                id: user.current_order_id
+            }
+        })
+
         if(user.current_order_id){
             await ctx.answerCallbackQuery(ctx.callbackQuery.id, {
                 text: messages[ctx.session.user.lang].notDeliveredMsg
+            })
+        }
+        if(!current_order.is_paid){
+            await ctx.answerCallbackQuery(ctx.callbackQuery.id, {
+                text: messages[ctx.session.user.lang].notPaidMsg
             })
         }
 
