@@ -208,7 +208,7 @@ module.exports = class Controllers {
         })
 
         if(user.current_order_id){
-            await ctx.answerCallbackQuery(ctx.callbackQuery.id, {
+            await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                 text: messages[ctx.session.user.lang].notDeliveredMsg
             })
         }
