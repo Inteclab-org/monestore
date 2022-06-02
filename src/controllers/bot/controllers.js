@@ -207,12 +207,12 @@ module.exports = class Controllers {
             raw: true
         })
 
-        if(user.current_order_id){
-            await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-                text: messages[ctx.session.user.lang].notDeliveredMsg
-            })
-            return
-        }
+        // if(user.current_order_id){
+        //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+        //         text: messages[ctx.session.user.lang].notDeliveredMsg
+        //     })
+        //     return
+        // }
 
         if (ctx.session.step == "order") {
             // await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
