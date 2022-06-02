@@ -207,20 +207,9 @@ module.exports = class Controllers {
             raw: true
         })
 
-        const current_order = await orders.findOne({
-            where: {
-                id: user.current_order_id
-            }
-        })
-
         if(user.current_order_id){
             await ctx.answerCallbackQuery(ctx.callbackQuery.id, {
                 text: messages[ctx.session.user.lang].notDeliveredMsg
-            })
-        }
-        if(current_order && !current_order.is_paid){
-            await ctx.answerCallbackQuery(ctx.callbackQuery.id, {
-                text: messages[ctx.session.user.lang].notPaidMsg
             })
         }
 
