@@ -35,7 +35,7 @@ const {
       }
       
       const user = await users.findByPk(decodedToken.id, {
-        attributes: ["telegram_id", "full_name", "language_code", "phone_number", "role"],
+        attributes: ["id", "telegram_id", "full_name", "language_code", "phone_number", "role"],
         raw: true
       })
   
@@ -47,7 +47,11 @@ const {
         throw new res.error(401, "User does not exist")
       }
 
-      req.user = user; 
+      req.user = {
+          tgid: Number(user.telegram_id),
+          id: Number(user.id),
+          role: Number(user.role),
+      }
       req.decodedToken = decodedToken;
   
       next()

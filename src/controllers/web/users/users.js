@@ -48,9 +48,9 @@ class UsersController{
             }
 
             req.user = {
-                tgid: user.telegram_id,
-                id: user.id,
-                role: user.role, 
+                tgid: Number(user.telegram_id),
+                id: Number(user.id),
+                role: Number(user.role),
             }
 
             next()
@@ -65,9 +65,9 @@ class UsersController{
         } = req;
 
         const token = sign({
-            tgid: user.telegram_id,
-            id: user.id,
-            role: user.role, 
+            tgid: Number(user.telegram_id),
+            id: Number(user.id),
+            role: Number(user.role), 
         }, configs.JWT_KEY)
 
         res.status(200).json({
