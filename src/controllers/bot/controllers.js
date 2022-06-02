@@ -211,6 +211,7 @@ module.exports = class Controllers {
             await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                 text: messages[ctx.session.user.lang].notDeliveredMsg
             })
+            return
         }
 
         if (ctx.session.step == "order") {
