@@ -666,22 +666,6 @@ module.exports = class Controllers {
                 query
             } = require('query-string').parseUrl(ctx.callbackQuery.data)
 
-            if (ctx.session.step == "verfiy") {
-                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-                    text: messages[ctx.session.user.lang].isVerifyingMsg,
-                    show_alert: true
-                })
-                return
-            }
-
-            if (ctx.session.step != "order") {
-                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-                    text: messages[ctx.session.user.lang].notOrderingMsg,
-                    show_alert: true
-                })
-                return
-            }
-
             let type = "text",
                 mType = "text"
             if (ctx.callbackQuery.message.photo) {
