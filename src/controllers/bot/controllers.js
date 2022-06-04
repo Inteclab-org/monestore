@@ -666,11 +666,13 @@ module.exports = class Controllers {
     static async setManualSize(ctx) {
         try {
 
-            let text = ctx.editing_item.message_content + `\nO'lcham: ${ctx.msg.text.toUpperCase()}`
+            let text = ctx.session.editing_item.message_content + `\nO'lcham: ${ctx.msg.text.toUpperCase()}`
+            let keyboard = InlineKeyboards[ctx.session.user.lang].amount_menu(ctx.session.editing_item.item_id)
 
-            if (ctx.session.order[ctx.session.editing_item.item_id].size != undefined) {
+            if (ctx.session.order[ctx.session.editing_item.item_id].amount != undefined) {
                 text = ctx.session.editing_item.message_content.replace(`O'lcham: ${ctx.session.order[ctx.session.editing_item.item_id].size.toUpperCase()}`, `O'lcham: ${ctx.msg.text.toUpperCase()}`)
                 text = text.replace("✏️", "✅")
+                keyboard = InlineKeyboards[ctx.session.user.lang].edit_item_menu(ctx.session.editing_item.item_id)    
             }
 
             ctx.session.order[ctx.session.editing_item.item_id].size = ctx.msg.text
@@ -680,7 +682,7 @@ module.exports = class Controllers {
                 ctx.session.editing_item.message_id,
                 ctx.session.editing_item.message_type,
                 text,
-                InlineKeyboards[ctx.session.user.lang].edit_item_menu(ctx.session.editing_item.item_id)
+                keyboard
             )
 
             ctx.session.messages_to_delete.push(ctx.msg.message_id)
@@ -871,7 +873,7 @@ module.exports = class Controllers {
             await ctx.reply(`${messages[ctx.session.user.lang].orderSavedMsg}`, {
                 parse_mode: "HTML",
                 reply_markup: {
-                    remove_keyboard: true
+                    keyboard: Keyboards[ctx.session.user.lang].cancel_order
                 }
             })
         } catch (error) {
@@ -999,7 +1001,10 @@ module.exports = class Controllers {
             })
 
             await ctx.reply(messages[ctx.session.user.lang].orderCancelledMsg, {
-                parse_mode: "HTML"
+                parse_mode: "HTML",
+                reply_markup: {
+                    remove_keyboard: true
+                }
             })
         } catch (error) {
             console.log(error);
