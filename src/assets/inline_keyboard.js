@@ -28,7 +28,9 @@ const InlineKeyboards = {
             .text("LX", `set_size?size=lx&item_id=${item_id}`)
             .text("S", `set_size?size=s&item_id=${item_id}`)
             .text("L", `set_size?size=l&item_id=${item_id}`)
-            .text("X", `set_size?size=x&item_id=${item_id}`),
+            .text("X", `set_size?size=x&item_id=${item_id}`)
+            .row()
+            .text("Boshqa o'lcham", `manual_size?item_id=${item_id}`),
 
         amount_menu: (item_id) =>
             new InlineKeyboard()
