@@ -52,7 +52,7 @@ const messages = {
     anotherTelMsg: "RU Qo'shimcha telefon raqam yuboring\n\nNamuna: 998901234567",
     incTelMsg: "RU Iltimos raqamni to'gri kiriting!",
     regSuccessMsg: "RU Ro'yhatdan muvaffaqiyatli o'tdingiz!",
-    orderFirstStep: "RU Mahsulotlar tugmasini bosing va o'zingizga yoqgan mahsulotni rasmini (skrinshot) yoki linkini yuboring",
+    orderFirstStep: "RU Quyidagi link orqali o'zingizga yoqgan mahsulotni rasmini (skrinshot) yoki linkini oling va botga yuboring. \n\n 👉https://telegra.ph/Aksessuarlar-03-07",
     menuMsg: "RU Asosiy menyu",
     amountMsg: "RU Miqdorni jo'nating!",
     sizeMsg: "RU O'lchamni jo'nating!",
