@@ -1,5 +1,5 @@
 module.exports = async (sequelize, DataTypes) => {
-    const order_items = sequelize.define("order_items", {
+    const transactions = sequelize.define("transactions", {
         id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -13,22 +13,16 @@ module.exports = async (sequelize, DataTypes) => {
                 key: "id"
             }
         },
-        link: {
-            type: DataTypes.TEXT(),
+        price: {
+            type: DataTypes.DECIMAL(10, 2),
         },
-        image_id: {
-            type: DataTypes.STRING(100),
-        },
-        amount: {
-            type: DataTypes.INTEGER,
-        },
-        size: {
-            type: DataTypes.STRING(5),
+        valid: {
+            type: DataTypes.BOOLEAN,
         }
     }, {
         updatedAt: 'updated_at',
         createdAt: 'created_at'
       })
 
-    return order_items
+      return transactions
 }

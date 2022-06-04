@@ -12,6 +12,7 @@ const {
 const {
     Sequelize
 } = require("sequelize")
+const { nextTick } = require("process")
 const {
     users,
     orders,
@@ -207,12 +208,13 @@ module.exports = class Controllers {
             raw: true
         })
 
-        // if(user.current_order_id){
-        //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-        //         text: messages[ctx.session.user.lang].notDeliveredMsg
-        //     })
-        //     return
-        // }
+        if(user.current_order_id){
+            await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                text: messages[ctx.session.user.lang].notDeliveredMsg,
+                show_alert: true
+            })
+            return
+        }
 
         if (ctx.session.step == "order") {
             // await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
@@ -561,6 +563,56 @@ module.exports = class Controllers {
         }
     }
 
+    static async getManualSize(ctx) {
+        try {
+            const {
+                query
+            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+
+            if (ctx.session.step == "size") {
+                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                    text: messages[ctx.session.user.lang].finishManualSizeMsg(ctx.session.editing_item.item_id),
+                    show_alert: true
+                })
+                return
+            }
+
+            if (ctx.session.step == "verfiy") {
+                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                    text: messages[ctx.session.user.lang].isVerifyingMsg,
+                    show_alert: true
+                })
+                return
+            }
+
+            if (ctx.session.step != "order") {
+                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                    text: messages[ctx.session.user.lang].notOrderingMsg,
+                    show_alert: true
+                })
+                return
+            }
+
+            ctx.session.editing_item.item_id = query.item_id
+            ctx.session.editing_item.message_id = ctx.callbackQuery.message.message_id
+            ctx.session.editing_item.message_content = ctx.callbackQuery.message.caption ? ctx.callbackQuery.message.caption : ctx.callbackQuery.message.text;
+
+            if (ctx.callbackQuery.message.photo) {
+                ctx.session.editing_item.message_type = "photo"
+            }
+
+            let m = await ctx.reply(messages[ctx.session.user.lang].sizeMsg, {
+                reply_to_message_id: ctx.callbackQuery.message.message_id
+            })
+
+            ctx.session.messages_to_delete.push(m.message_id)
+
+            await ctx.answerCallbackQuery()
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     static async getManualAmount(ctx) {
         try {
             const {
@@ -606,6 +658,39 @@ module.exports = class Controllers {
             ctx.session.messages_to_delete.push(m.message_id)
 
             await ctx.answerCallbackQuery()
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    static async setManualSize(ctx) {
+        try {
+
+            let text = ctx.editing_item.message_content + `\nO'lcham: ${ctx.msg.text.toUpperCase()}`
+
+            if (ctx.session.order[ctx.session.editing_item.item_id].size != undefined) {
+                text = ctx.session.editing_item.message_content.replace(`O'lcham: ${ctx.session.order[ctx.session.editing_item.item_id].size.toUpperCase()}`, `O'lcham: ${ctx.msg.text.toUpperCase()}`)
+                text = text.replace("✏️", "✅")
+            }
+
+            ctx.session.order[ctx.session.editing_item.item_id].size = ctx.msg.text
+
+            await editMessage(
+                ctx,
+                ctx.session.editing_item.message_id,
+                ctx.session.editing_item.message_type,
+                text,
+                InlineKeyboards[ctx.session.user.lang].edit_item_menu(ctx.session.editing_item.item_id)
+            )
+
+            ctx.session.messages_to_delete.push(ctx.msg.message_id)
+            ctx.session.editing_item.item_id = null
+            ctx.session.editing_item.message_id = null
+            ctx.session.editing_item.message_type = "text"
+            ctx.session.editing_item.message_content = ""
+
+            await cleanMessages(ctx)
+            return true
         } catch (error) {
             console.log(error);
         }
@@ -781,10 +866,9 @@ module.exports = class Controllers {
             }
 
             ctx.session.order = {}
-            ctx.session.current_order_id = order.id
 
             // buni o'zgartirish kerak!
-            await ctx.reply(`${messages[ctx.session.user.lang].verifiedMsg}`, {
+            await ctx.reply(`${messages[ctx.session.user.lang].orderSavedMsg}`, {
                 parse_mode: "HTML",
                 reply_markup: {
                     remove_keyboard: true
@@ -824,21 +908,29 @@ module.exports = class Controllers {
 
     static async getPaymentImage(ctx) {
         try {
-            if (!ctx.msg.photo) {
-                await ctx.reply("Rasm jo'natishingiz kerak!", {
+
+            const user = await users.findOne({
+                where: {
+                    id: ctx.session.user.id
+                },
+                raw: true
+            })
+
+            const order = await orders.findOne({
+                where: {
+                    id: user.current_order_id
+                }
+            })
+
+            if (order && order.payment_pending) {
+                await ctx.reply(messages[ctx.session.user.lang].paymentNotCheckedMsg, {
                     parse_mode: "HTML"
                 })
                 return false
             }
 
-            const order = await orders.findOne({
-                where: {
-                    id: ctx.session.current_order_id
-                }
-            })
-
-            if (order && order.payment_pending) {
-                await ctx.reply("Avvalgi to'lov hali adminlar tomonidan ko'rib chiqilmagan. Iltimos, javobni kuting.", {
+            if (!ctx.msg.photo) {
+                await ctx.reply(messages[ctx.session.user.lang].imageRequiredMsg, {
                     parse_mode: "HTML"
                 })
                 return false
@@ -853,30 +945,16 @@ module.exports = class Controllers {
                 status: 3
             }, {
                 where: {
-                    id: ctx.session.current_order_id
+                    id: user.current_order_id
                 }
             })
 
             if (!updated_order[0]) return false
 
-            await ctx.reply("To'lov tasdiqlanishini kuting...", {
+            await ctx.reply(messages[ctx.session.user.lang].waitVerificationMsg, {
                 parse_mode: "HTML"
             })
 
-            // setTimeout(async () => {
-            //     await orders.update({
-            //         payment_pending: false,
-            //         is_paid: true,
-            //         status: 3
-            //     }, {
-            //         where: {
-            //             id: ctx.session.current_order_id
-            //         }
-            //     })
-            //     await ctx.reply("To'lov tasdiqlandi, haridingiz uchun tashakkur!", {
-            //         parse_mode: "HTML"
-            //     })
-            // }, 2000)
         } catch (error) {
             console.log(error);
         }
@@ -891,6 +969,38 @@ module.exports = class Controllers {
             delete ctx.session.order[query.item_id]
 
             await ctx.api.deleteMessage(ctx.msg.chat.id, ctx.callbackQuery.message.message_id)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    static async cancelOrder(ctx) {
+        try {
+            const user = await users.findOne({
+                where: {
+                    id: ctx.session.user.id
+                },
+                raw: true
+            })
+            const order = await orders.update({
+                status: 0
+            },{
+                where: {
+                    id: user.current_order_id
+                }
+            })
+
+            await users.update({
+                current_order_id: null
+            },{
+                where: {
+                    id: user.id
+                }
+            })
+
+            await ctx.reply(messages[ctx.session.user.lang].orderCancelledMsg, {
+                parse_mode: "HTML"
+            })
         } catch (error) {
             console.log(error);
         }

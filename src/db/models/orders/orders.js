@@ -42,4 +42,6 @@ module.exports = async (sequelize, DataTypes) => {
         updatedAt: 'updated_at',
         createdAt: 'created_at'
       })
+
+    return orders
 }

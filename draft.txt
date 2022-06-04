@@ -1,6 +1,9 @@
 statuses: 
+    0 - calcelled
     1 - created
-    2 - payment image pending
-    3 - payment image sent
-    4 - payment unverified
-    5 - payment verified
+    2 - cost set (or payment unverified) & pending payment image
+    3 - payment image sent but not checked yet
+    4 - payment verified and need to deliver
+    5 - delivered
+
+    

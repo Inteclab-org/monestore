@@ -40,7 +40,10 @@ const {
     changeCredentials,
     openMyOrdersMenu,
     sendOrders,
-    sendCurrentOrder
+    sendCurrentOrder,
+    cancelOrder,
+    getManualSize,
+    setManualSize
 } = require('./controllers/bot/controllers')
 const messages = require('./assets/messages')
 const InlineKeyboards = require('./assets/inline_keyboard')
@@ -175,6 +178,12 @@ async function tgBot() {
                 break;
         }
     })
+    bot.hears(["Buyurtmani bekor qilish", "RU Buyurtmani bekor qilish"], async (ctx) => {
+        await cancelOrder(ctx)
+        await sendMenu(ctx)
+        ctx.session.step = "menu",
+        await updateUserStep(ctx, ctx.session.step)
+    })
 
     router.route("language", async (ctx) => {
         await ctx.deleteMessage()
@@ -212,6 +221,13 @@ async function tgBot() {
 
     router.route("amount", async (ctx) => {
         let a = await setManualAmount(ctx)
+        if (!a) return
+        ctx.session.step = "order"
+        await updateUserStep(ctx, ctx.session.step)
+    })
+
+    router.route("size", async (ctx) => {
+        let a = await setManualSize(ctx)
         if (!a) return
         ctx.session.step = "order"
         await updateUserStep(ctx, ctx.session.step)
@@ -315,6 +331,11 @@ async function tgBot() {
                 ctx.session.step = "amount"
                 await updateUserStep(ctx, ctx.session.step)
                 break
+            case "manual_size":
+                await getManualSize(ctx)
+                ctx.session.step = "size"
+                await updateUserStep(ctx, ctx.session.step)
+                break
             case "change_size":
                 await changeToEditMenu(ctx, "sizes_menu")
                 break
@@ -347,4 +368,21 @@ async function tgBot() {
     bot.start()
 }
 
-module.exports = tgBot
+async function sendCost(user_chat_id, order_id, cost, text){
+    await bot.api.sendMessage(user_chat_id, `${order_id}-buyurtmangizning umumiy narxi <b>${cost}</b> so'm etib belgilandi. \nQo'shimcha izoh: ${text ? `<b>${text}</b>` : "mavjud emas"}. \nTo'lovni tasdiqlovchi rasmni jo'nating.`, {
+        parse_mode: "HTML"
+    })
+}
+
+async function sendVerification(user_chat_id, valid){
+    let text = valid ? `To'lov tasdiqlanidi✅` : `To'lov tadiqlanmadi❌`
+    await bot.api.sendMessage(user_chat_id, text, {
+        parse_mode: "HTML"
+    })
+}
+
+module.exports = {
+    tgBot,
+    sendCost,
+    sendVerification
+}
