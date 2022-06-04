@@ -139,7 +139,9 @@ async function tgBot() {
         }
 
         ctx.session.step = user.step
-        await sendMenu(ctx)
+        if (user.step == "menu") {
+            await sendMenu(ctx)
+        }
     })
 
     const router = new Router((ctx) => ctx.session.step)

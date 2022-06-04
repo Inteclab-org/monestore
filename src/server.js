@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
 const configs = require('./config')
 const sequelize = require('./db/db');
 const { errorMiddleware } = require("./middlewares/error/errorMiddleware");
@@ -15,6 +16,7 @@ app.use(express.urlencoded({extended: true}))
 app.use("uploads", express.static(path.join(__dirname, "src", "uploads")))
 
 app.use(errorMiddleware)
+app.use(cors())
 
 app.use("/api", router)
 app.use(errorHandler)
