@@ -10,7 +10,6 @@ require("dotenv").config()
 
 const app = express();
 
-app.use(cors({ origin: "*" }))
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
@@ -18,6 +17,7 @@ app.use("uploads", express.static(path.join(__dirname, "src", "uploads")))
 
 app.use(errorMiddleware)
 
+app.use(cors({ origin: "*" }))
 app.use("/api", router)
 app.use(errorHandler)
 
