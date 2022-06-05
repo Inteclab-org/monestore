@@ -895,6 +895,7 @@ module.exports = class Controllers {
             await ctx.reply(`${messages[ctx.session.user.lang].orderSavedMsg}`, {
                 parse_mode: "HTML",
                 reply_markup: {
+                    resize_keyboard: true,
                     keyboard: Keyboards[ctx.session.user.lang].cancel_order.build()
                 }
             })
@@ -1002,7 +1003,7 @@ module.exports = class Controllers {
         try {
             const user = await users.findOne({
                 where: {
-                    id: ctx.session.user.id
+                    telegram_id: ctx.msg.chat.id
                 },
                 raw: true
             })

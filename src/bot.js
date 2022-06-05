@@ -159,6 +159,35 @@ async function tgBot() {
         }
     })
 
+    bot.on("message", async (ctx, next) => {
+        const chat_id = ctx.msg.chat.id
+
+        console.log(chat_id);
+
+        let user = await users.findOne({
+            where: {
+                telegram_id: chat_id
+            },
+            raw: true
+        })
+
+        if (!user) {
+            await ctx.reply("/start")
+            return
+        }
+
+        ctx.session.user = {
+            tgid: chat_id,
+            id: user.id,
+            name: user.full_name,
+            lang: user.language_code,
+            phone: user.phone_number,
+        }
+
+        ctx.session.step = user.step
+        next()
+    })
+
     const router = new Router((ctx) => ctx.session.step)
 
     bot.hears(["Bekor qilish", "RU Bekor qilish"], async (ctx) => {
