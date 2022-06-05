@@ -156,7 +156,7 @@ async function tgBot() {
         let v = await endOrderProccess(ctx)
         if (!v) return
         ctx.session.step = "verify"
-        updateUserStep(ctx, ctx.session.step)
+        await updateUserStep(ctx, ctx.session.step)
     })
     bot.hears(["Ha", "RU Ha"], async (ctx) => {
         switch (ctx.session.step) {

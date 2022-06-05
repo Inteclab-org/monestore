@@ -42,6 +42,14 @@ const messages = {
     paymentNotCheckedMsg: "Avvalgi to'lov hali adminlar tomonidan ko'rib chiqilmagan. Iltimos, javobni kuting.",
     waitVerificationMsg: "To'lov tasdiqlanishini kuting...",
     orderCancelledMsg: "Buyurtmangiz bekor qilindi.",
+    cannotOrderMsg: "Hozircha yangi buyurtma bera olmaysiz.",
+    pleaseWaitMsg: "Iltimos, kuting.",
+    statusMessages: {
+      "1": "Oxirgi buyurtmangizga hali narx belgilanmadi!",
+      "2": "Oxirgi buyurtmangizga to'lov qilinmagan. Iltimos, to'lovni tasdiqlovchi rasmni jo'naiting!",
+      "3": "Oxirgi buyurtmangizga qilingan to'lov hali tasdiqlanmadi!",
+      "4": "Oxirgi buyurtmangiz hali yetkazib berilmadi!",
+    }
   },
   ru: {
     orderCancelledMsg: "RU Buyurtmangiz bekor qilindi.",
@@ -85,6 +93,13 @@ const messages = {
     orderInstructions: "RU Mahsulotlarni yuborib bo'lgach buyurtmani ro'yxatdan o'tkazish uchun <b>Tasdiqlash</b> tugmasini bosing!\n<b>Bekor qilish</b> tugmasi esa jarayonni to'xtatadi!",
     imageRequiredMsg: "RU Rasm jo'natishingiz kerak!",
     paymentNotCheckedMsg: "RU Avvalgi to'lov hali adminlar tomonidan ko'rib chiqilmagan. Iltimos, javobni kuting.",
+    pleaseWaitMsg: "Iltimos, kuting.",
+    statusMessages: {
+      "1": "Oxirgi buyurtmangizga hali narx belgilanmadi!",
+      "2": "Oxirgi buyurtmangizga to'lov qilinmagan. Iltimos, to'lovni tasdiqlovchi rasmni jo'naiting!",
+      "3": "Oxirgi buyurtmangizga qilingan to'lov hali tasdiqlanmadi!",
+      "4": "Oxirgi buyurtmangiz hali yetkazib berilmadi!",
+    }
   }
 }
 

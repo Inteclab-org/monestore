@@ -208,6 +208,26 @@ module.exports = class Controllers {
             raw: true
         })
 
+        const order = await orders.findOne({
+            where: {
+                id: user.current_order_id
+            },
+            raw: true
+        })
+
+        let statuses = [1,2,3,4]
+
+        for (const s of statuses) {
+            if(order.status != 5 && order.status == s){
+                console.log(s);
+                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                    text: messages[ctx.session.user.lang].statusMessages[s],
+                    show_alert: true
+                })
+                return
+            }
+        }
+
         if(user.current_order_id){
             await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                 text: messages[ctx.session.user.lang].notDeliveredMsg,

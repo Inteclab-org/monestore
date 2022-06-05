@@ -16,8 +16,14 @@ module.exports = async (sequelize, DataTypes) => {
         price: {
             type: DataTypes.DECIMAL(10, 2),
         },
+        image_id: {
+            type: DataTypes.STRING(100),
+        },
         valid: {
             type: DataTypes.BOOLEAN,
+        },
+        text: {
+            type: DataTypes.STRING(148),
         }
     }, {
         updatedAt: 'updated_at',
