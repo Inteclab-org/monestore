@@ -150,10 +150,10 @@ module.exports = class Controllers {
 
         let x = await ctx.reply(messages[ctx.session.user.lang].telMsg, {
             parse_mode: "HTML",
-            reply_markup: {
-                resize_keyboard: true,
-                keyboard: Keyboards[ctx.session.user.lang].share_phone.build()
-            }
+            // reply_markup: {
+            //     resize_keyboard: true,
+            //     keyboard: Keyboards[ctx.session.user.lang].share_phone.build()
+            // }
         })
 
     }

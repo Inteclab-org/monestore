@@ -245,13 +245,13 @@ async function tgBot() {
     router.route("phone", async (ctx) => {
         let p = await setPhone(ctx)
         if (!p) return
-        await ctx.reply(messages[ctx.session.user.lang].regSuccessMsg, {
-            parse_mode: "HTML",
-            reply_markup: {
-                remove_keyboard: true
-            }
-        })
-        await sendMenu(ctx)
+        // await ctx.reply(messages[ctx.session.user.lang].regSuccessMsg, {
+        //     parse_mode: "HTML",
+        //     reply_markup: {
+        //         remove_keyboard: true
+        //     }
+        // })
+        await sendMenu(ctx, messages[ctx.session.user.lang].regSuccessMsg)
         ctx.session.step = "menu"
         await updateUserStep(ctx, ctx.session.step)
     })
