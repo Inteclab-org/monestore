@@ -81,9 +81,83 @@ async function tgBot() {
             command: "start",
             description: "Start the bot"
         },
-        // { command: "help", description: "Show help text" },
-        // { command: "settings", description: "Open settings" },
+        { command: "/menu", description: "Show help text" },
     ]);
+
+    bot.command("menu", async (ctx) => {
+        const chat_id = ctx.msg.chat.id
+        let user = await users.findOne({
+            where: {
+                telegram_id: chat_id
+            },
+            raw: true
+        })
+
+        if(user){
+            await sendMenu(ctx)
+        }else{
+            await ctx.reply("Siz ro'yxatdan o'tmagansiz!\nYou are not registered!")
+        }
+    })
+
+    bot.command("start", async (ctx, next) => {
+        const chat_id = ctx.msg.chat.id
+
+        console.log(chat_id);
+
+        let user = await users.findOne({
+            where: {
+                telegram_id: chat_id
+            },
+            raw: true
+        })
+
+        if (!user) {
+            const role = chat_id === configs.ADMIN_ID ? 2 : 1
+            user = await users.create({
+                telegram_id: chat_id,
+                role: role,
+                step: "language"
+            })
+            ctx.session.user.tgid = chat_id
+            ctx.session.user.id = user.id
+            ctx.session.step = "language"
+            await selectLanguage(ctx)
+            return
+        } else if (user) {
+
+            if(!user.language_code){
+                ctx.session.step = "language"
+                await selectLanguage(ctx)
+                return
+            }
+            if (!user.full_name) {
+                ctx.session.step = "name"
+                await askName(ctx)
+                await updateUserStep(ctx, ctx.session.step)
+                return
+            }
+            if (!user.phone_number) {
+                ctx.session.step = "phone"
+                await askPhone(ctx)
+                await updateUserStep(ctx, ctx.session.step)
+                return
+            }
+        }
+
+        ctx.session.user = {
+            tgid: chat_id,
+            id: user.id,
+            name: user.full_name,
+            lang: user.language_code,
+            phone: user.phone_number,
+        }
+
+        ctx.session.step = user.step
+        if (user.step == "menu") {
+            await sendMenu(ctx)
+        }
+    })
 
     const router = new Router((ctx) => ctx.session.step)
 
@@ -326,63 +400,6 @@ async function sendVerification(user_chat_id, valid){
         }
     })
 }
-
-bot.command("start", async (ctx, next) => {
-    const chat_id = ctx.msg.chat.id
-
-    console.log(chat_id);
-
-    let user = await users.findOne({
-        where: {
-            telegram_id: chat_id
-        },
-        raw: true
-    })
-
-    if (!user) {
-        const role = chat_id === configs.ADMIN_ID ? 2 : 1
-        user = await users.create({
-            telegram_id: chat_id,
-            role: role,
-            step: "language"
-        })
-        ctx.session.user.tgid = chat_id
-        ctx.session.user.id = user.id
-        ctx.session.step = "language"
-        await selectLanguage(ctx)
-        return
-    } else if (user) {
-
-        if(!user.language_code){
-            ctx.session.step = "language"
-            await selectLanguage(ctx)
-            return
-        }
-        if (!user.full_name) {
-            ctx.session.step = "name"
-            await askName(ctx)
-            await updateUserStep(ctx, ctx.session.step)
-            return
-        }
-        if (!user.phone_number) {
-            ctx.session.step = "phone"
-            await askPhone(ctx)
-            await updateUserStep(ctx, ctx.session.step)
-            return
-        }
-    }
-
-    ctx.session.user = {
-        tgid: chat_id,
-        id: user.id,
-        name: user.full_name,
-        lang: user.language_code,
-        phone: user.phone_number,
-    }
-
-    ctx.session.step = user.step
-    await sendMenu(ctx)
-})
 
 module.exports = {
     tgBot,
