@@ -893,7 +893,7 @@ module.exports = class Controllers {
             await ctx.reply(`${messages[ctx.session.user.lang].orderSavedMsg}`, {
                 parse_mode: "HTML",
                 reply_markup: {
-                    keyboard: Keyboards[ctx.session.user.lang].cancel_order
+                    keyboard: Keyboards[ctx.session.user.lang].cancel_order.build()
                 }
             })
         } catch (error) {
