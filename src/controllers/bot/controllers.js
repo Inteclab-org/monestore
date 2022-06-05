@@ -228,13 +228,13 @@ module.exports = class Controllers {
             }
         }
 
-        if(user.current_order_id){
-            await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-                text: messages[ctx.session.user.lang].notDeliveredMsg,
-                show_alert: true
-            })
-            return
-        }
+        // if(user.current_order_id){
+        //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+        //         text: messages[ctx.session.user.lang].notDeliveredMsg,
+        //         show_alert: true
+        //     })
+        //     return
+        // }
 
         if (ctx.session.step == "order") {
             // await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
