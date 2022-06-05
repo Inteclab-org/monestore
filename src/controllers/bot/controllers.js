@@ -328,9 +328,7 @@ module.exports = class Controllers {
             ]
         })
 
-        console.log(offset);
-
-        if (offset >= allOrders.count) {
+        if (offset != 0 && offset >= allOrders.count) {
             await ctx.answerCallbackQuery()
             return
         }
