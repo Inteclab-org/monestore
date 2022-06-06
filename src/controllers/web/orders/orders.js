@@ -15,7 +15,7 @@ class OrdersController{
 
             let conditions = {}
 
-            if (status != null && status != undefined) {
+            if (status && status != null && status != undefined) {
                 conditions.status = status
             }
 
