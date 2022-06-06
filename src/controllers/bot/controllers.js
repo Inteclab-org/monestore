@@ -934,6 +934,13 @@ module.exports = class Controllers {
                 }
             })
 
+            if(order.is_paid){
+                ctx.session.step = "menu"
+                await updateUserStep(ctx, ctx.session.step)
+                await sendMenu(ctx)
+                return false
+            }
+
             if (order && !order.price) {
                 await ctx.reply(messages[ctx.session.user.lang].noCostMsg, {
                     parse_mode: "HTML"
