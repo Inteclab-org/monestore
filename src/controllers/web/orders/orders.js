@@ -1,5 +1,5 @@
 const { Op } = require("sequelize")
-const { sendCost, sendVerification } = require("../../../bot")
+const { sendCost, sendVerification, getFile } = require("../../../bot")
 const sequelize = require("../../../db/db")
 const { users, orders, order_items, transactions } = sequelize.models
 
@@ -242,6 +242,24 @@ class OrdersController{
                 message: "Order status updated"
             })
         } catch (error) {
+            next(error)
+        }
+    }
+
+    static async GetFile(req, res, next){
+        try {
+            const { params: {file_id} } = req
+            
+            const f = await getFile(file_id)
+
+            res.status(200).json({
+                ok: true,
+                data: {
+                    file: f
+                }
+            })
+        } catch (error) {
+            console.log(error);
             next(error)
         }
     }
