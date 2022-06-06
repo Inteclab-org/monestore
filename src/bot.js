@@ -105,7 +105,6 @@ async function tgBot() {
         }else{
             await ctx.reply("Siz ro'yxatdan o'tmagansiz!\nYou are not registered!")
         }
-        next()
     })
 
     bot.command("start", async (ctx, next) => {
