@@ -886,7 +886,7 @@ module.exports = class Controllers {
                         ...element,
                         order_id: order.id
                     })
-                    let file = await ctx.getFile(element.file_id)
+                    let file = await ctx.getFile(element.image_id)
                     await file.download(path.join(__dirname, "..", "..", "uploads", "files", element.file_id + ".jpg"))
                 }
             }
