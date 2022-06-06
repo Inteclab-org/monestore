@@ -55,7 +55,11 @@ const {
     transactions
 } = sequelize.models
 
+const { FileFlavor, hydrateFiles } = require("@grammyjs/files");
+
 const bot = new Bot(configs.TG_TOKEN);
+
+bot.api.use(hydrateFiles(configs.TG_TOKEN))
 
 async function tgBot() {
     bot.use(session({

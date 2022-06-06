@@ -21,8 +21,6 @@ const {
     transactions
 } = sequelize.models
 
-const { FileFlavor, hydrateFiles } = require("@grammyjs/files");
-
 module.exports = class Controllers {
 
     static async updateUserStep(ctx, step) {
