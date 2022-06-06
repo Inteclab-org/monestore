@@ -887,7 +887,7 @@ module.exports = class Controllers {
                     })
                     if (element.file_id) {
                         let file = await ctx.api.getFile(element.image_id)
-                        await fileDownloader(file)
+                        fileDownloader(file)
                     }
                 }
             }

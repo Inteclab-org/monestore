@@ -3,7 +3,7 @@ const fs = require("fs")
 const path = require("path")
 const configs = require('../config')
 
-module.exports.fileDownloader = async function(file){
+function fileDownloader(file){
     try {
         let url = `http://api.telegram.org/file/bot${configs.TG_TOKEN}/${file.file_path}`
 
@@ -17,3 +17,5 @@ module.exports.fileDownloader = async function(file){
         console.log("Downloader error",error);
     }
 }
+
+module.exports = fileDownloader
