@@ -224,7 +224,7 @@ module.exports = class Controllers {
             for (const s of statuses) {
                 if(order.status != 5 && order.status == s){
                     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-                        text: messages[ctx.session.user.lang].statusMessages[s],
+                        text: messages[ctx.session.user.lang].statusMessages[s]+messages[ctx.session.user.lang].cannotOrderMsg,
                         show_alert: true
                     })
                     return
