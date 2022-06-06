@@ -91,7 +91,7 @@ async function tgBot() {
         { command: "/menu", description: "Show help text" },
     ]);
 
-    bot.command("menu", async (ctx, next) => {
+    bot.command("menu", async (ctx) => {
         const chat_id = ctx.msg.chat.id
         let user = await users.findOne({
             where: {
@@ -274,7 +274,6 @@ async function tgBot() {
     })
 
     router.route("menu", async (ctx) => {
-        await ctx.deleteMessage()
         await sendMenu(ctx)
     })
 
