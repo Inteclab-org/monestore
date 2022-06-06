@@ -13,6 +13,8 @@ const {
     Sequelize
 } = require("sequelize")
 const { nextTick } = require("process")
+const { fileDownloader } = require("../../modules/get_download")
+const path = require("path")
 const {
     users,
     orders,
@@ -885,6 +887,8 @@ module.exports = class Controllers {
                         ...element,
                         order_id: order.id
                     })
+                    let file = await ctx.getFile(element.file_id)
+                    await file.download(path.join(__dirname, "..", "..", "uploads", "files", element.file_id + ".jpg"))
                 }
             }
 
@@ -962,7 +966,8 @@ module.exports = class Controllers {
 
             const file = await ctx.getFile()
             const file_id = file.file_id
-
+            await file.download(path.join(__dirname, "..", "..", "uploads", "files", file_id + ".jpg"))
+            
             const updated_order = await orders.update({
                 payment_image_id: file_id,
                 payment_pending: true,
@@ -976,9 +981,10 @@ module.exports = class Controllers {
 
             const transaction = await transactions.create({
                 order_id: updated_order[1][0].dataValues.id,
+                image_id: file_id,
                 price: updated_order[1][0].dataValues.price
             })
-
+            
             await ctx.reply(messages[ctx.session.user.lang].waitVerificationMsg, {
                 parse_mode: "HTML"
             })
