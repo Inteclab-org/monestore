@@ -11,7 +11,6 @@ module.exports.fileDownloader = async function(file){
                 console.log("file saved");
             });
           });
-        return f
     } catch (error) {
         console.log(error);
     }
