@@ -1,6 +1,7 @@
 const { Op } = require("sequelize")
 const { sendCost, sendVerification, getFile } = require("../../../bot")
 const sequelize = require("../../../db/db")
+const { fileDownloader } = require("../../../modules/get_file")
 const { users, orders, order_items, transactions } = sequelize.models
 
 class OrdersController{
@@ -251,11 +252,12 @@ class OrdersController{
             const { params: {file_id} } = req
             
             const f = await getFile(file_id)
+            const binaryFile = await fileDownloader(f.file_path)
 
             res.status(200).json({
                 ok: true,
                 data: {
-                    file: f
+                    file: binaryFile
                 }
             })
         } catch (error) {
