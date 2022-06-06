@@ -93,6 +93,20 @@ class OrdersController{
         try {
             const { query, params, body } = req
 
+            const o = await orders.findOne({
+                where: {
+                    id: params.id
+                }
+            })
+
+            if(o.status == 0){
+                res.status(400).json({
+                    ok: false,
+                    message: "Order was cancelled!"
+                })
+                return
+            }
+
             const order = await orders.update({
                 price: body.cost,
                 text: body.text,
