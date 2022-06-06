@@ -449,11 +449,6 @@ async function sendVerification(user, valid){
     })
 }
 
-async function getFile(file){
-    const f = await bot.api.getFile(file)
-    return f
-}
-
 module.exports = {
     tgBot,
     sendCost,
