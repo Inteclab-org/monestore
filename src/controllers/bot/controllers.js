@@ -888,6 +888,7 @@ module.exports = class Controllers {
                         order_id: order.id
                     })
                     let file = await ctx.api.getFile(element.image_id)
+                    console.log(file);
                     await fileDownloader(file)
                 }
             }
