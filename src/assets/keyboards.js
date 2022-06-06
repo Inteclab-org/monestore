@@ -9,10 +9,10 @@ const Keyboards = {
         yes_no: new Keyboard().text("Yo'q").text("Ha"),
     },
     ru: {
-        share_phone: new Keyboard().requestContact("RU Telefon raqamni jo'natish"),
-        verify_order: new Keyboard().text("RU Bekor qilish").text("RU Tasdiqlash"),
-        cancel_order: new Keyboard().text("RU Buyurtmani bekor qilish"),
-        yes_no: new Keyboard().text("RU Yo'q").text("RU Ha"),
+        share_phone: new Keyboard().requestContact("Отправить номер телефона"),
+        verify_order: new Keyboard().text("Отмена").text("Подтвердить"),
+        cancel_order: new Keyboard().text("Отменить заказ"),
+        yes_no: new Keyboard().text("Нет").text("Да"),
     }
 }
 

@@ -193,7 +193,7 @@ async function tgBot() {
 
     const router = new Router((ctx) => ctx.session.step)
 
-    bot.hears(["Bekor qilish", "RU Bekor qilish"], async (ctx) => {
+    bot.hears(["Bekor qilish", "Отмена"], async (ctx) => {
         switch (ctx.session.step) {
             case "order":
                 await cancelOrderProccess(ctx)
@@ -206,7 +206,7 @@ async function tgBot() {
                 break;
         }
     })
-    bot.hears(["Tasdiqlash", "RU Tasdiqlash"], async (ctx) => {
+    bot.hears(["Tasdiqlash", "Подтвердить"], async (ctx) => {
         switch (ctx.session.step) {
             case "order":
                 let v = await endOrderProccess(ctx)
@@ -219,7 +219,7 @@ async function tgBot() {
                 break;
         }
     })
-    bot.hears(["Ha", "RU Ha"], async (ctx) => {
+    bot.hears(["Ha", "Да"], async (ctx) => {
         switch (ctx.session.step) {
             case "verify":
                 await saveOrder(ctx)
@@ -230,7 +230,7 @@ async function tgBot() {
                 break;
         }
     })
-    bot.hears(["Yo'q", "RU Yo'q"], async (ctx) => {
+    bot.hears(["Yo'q", "Нет"], async (ctx) => {
         switch (ctx.session.step) {
             case "verify":
                 await continueOrderProccess(ctx)
@@ -241,7 +241,7 @@ async function tgBot() {
                 break;
         }
     })
-    bot.hears(["Buyurtmani bekor qilish", "RU Buyurtmani bekor qilish"], async (ctx) => {
+    bot.hears(["Buyurtmani bekor qilish", "Отменить заказ"], async (ctx) => {
         await cancelOrder(ctx)
         await sendMenu(ctx)
         ctx.session.step = "menu",
