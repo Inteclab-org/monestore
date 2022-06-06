@@ -6,6 +6,6 @@ const router = require('express').Router()
 
 router.use("/users", UsersRouter)
 router.use("/orders", OrdersRouter)
-router.use("/resources", FilesRouter)
+// router.use("/resources", FilesRouter)
 
 module.exports = router
