@@ -21,7 +21,7 @@ const {
     transactions
 } = sequelize.models
 
-import { FileFlavor, hydrateFiles } from "@grammyjs/files";
+const { FileFlavor, hydrateFiles } = require("@grammyjs/files");
 
 module.exports = class Controllers {
 
