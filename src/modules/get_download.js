@@ -1,4 +1,3 @@
-const { default: fetch } = require("node-fetch");
 const request = require("request")
 const fs = require("fs")
 const path = require("path")
