@@ -110,8 +110,6 @@ async function tgBot() {
     bot.command("start", async (ctx, next) => {
         const chat_id = ctx.msg.chat.id
 
-        console.log(chat_id);
-
         let user = await users.findOne({
             where: {
                 telegram_id: chat_id
@@ -168,8 +166,6 @@ async function tgBot() {
 
     bot.on("message", async (ctx, next) => {
         const chat_id = ctx.msg.chat.id
-
-        console.log(chat_id);
 
         let user = await users.findOne({
             where: {
@@ -438,8 +434,6 @@ async function tgBot() {
 }
 
 async function sendCost(user, order_id, cost, text){
-    console.log(user);
-    console.log(messages[user.language_code].costSetMsg);
     await bot.api.sendMessage(user.telegram_id, messages[user.language_code].costSetMsg(order_id, cost, text), {
         parse_mode: "HTML"
     })

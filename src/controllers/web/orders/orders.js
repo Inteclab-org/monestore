@@ -88,8 +88,6 @@ class OrdersController{
         try {
             const { query, params, body } = req
 
-            console.log(params);
-
             const order = await orders.update({
                 price: body.cost,
                 text: body.text,
@@ -153,8 +151,6 @@ class OrdersController{
                 return
             }
 
-            console.log(o.transactions);
-
             if(body.is_paid && o.transactions[0].valid){
                 res.status(400).json({
                     ok: false,
@@ -210,7 +206,6 @@ class OrdersController{
                 message: "Order updated"
             })
         } catch (error) {
-            console.log(error);
             next(error)
         }
     }

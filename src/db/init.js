@@ -24,7 +24,5 @@ module.exports.init = async function() {
             user_id: user.id,
             password: createCrypt(configs.PASSWORD)
         })
-
-        console.log("ADMIN", admin);
     }
 }
