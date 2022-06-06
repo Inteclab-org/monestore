@@ -972,8 +972,6 @@ module.exports = class Controllers {
                 }
             })
 
-            if (!updated_order[0]) return false
-
             await ctx.reply(messages[ctx.session.user.lang].waitVerificationMsg, {
                 parse_mode: "HTML"
             })

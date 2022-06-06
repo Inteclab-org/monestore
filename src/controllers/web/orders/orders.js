@@ -203,6 +203,16 @@ class OrdersController{
                 }
             })
 
+            if(body.status == 5){
+                await users.update({
+                    current_order_id: null
+                },{
+                    where: {
+                        id: order[1][0].dataValues.user_id
+                    }
+                })
+            }
+
             res.status(200).json({
                 ok: true,
                 message: "Order status updated"

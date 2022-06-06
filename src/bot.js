@@ -281,9 +281,25 @@ async function tgBot() {
 
     router.route("payment", async (ctx) => {
         let a = await getPaymentImage(ctx)
-        if (!a) return
-        ctx.session.step = "menu"
-        await updateUserStep(ctx, ctx.session.step)
+        // if (!a) return
+        const user = await users.findOne({
+            where: {
+                telegram_id: ctx.msg.chat.id
+            },
+            attributes: ["current_order_id"],
+            raw: true
+        })
+        const order = await orders.findOne({
+            where: {
+                id: user.current_order_id
+            }
+        })
+
+        if(order.is_paid){
+            ctx.session.step = "menu"
+            await updateUserStep(ctx, ctx.session.step)
+            await sendMenu(ctx)
+        }
     })
 
     router.route(`edit_user_info:name`, async (ctx) => {
