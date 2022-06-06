@@ -452,6 +452,5 @@ async function sendVerification(user, valid){
 module.exports = {
     tgBot,
     sendCost,
-    getFile,
     sendVerification
 }
