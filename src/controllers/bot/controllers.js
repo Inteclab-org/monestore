@@ -957,7 +957,7 @@ module.exports = class Controllers {
 
             const file = await ctx.getFile()
             const file_id = file.file_id
-            await fileDownloader(file)
+            await fileDownloader(file, file_id)
             
             const updated_order = await orders.update({
                 payment_image_id: file_id,
