@@ -14,6 +14,7 @@ const {
 } = require("sequelize")
 const { nextTick } = require("process")
 const path = require("path")
+const { fileDownloader } = require("../../modules/get_download")
 const {
     users,
     orders,
@@ -887,7 +888,7 @@ module.exports = class Controllers {
                         order_id: order.id
                     })
                     let file = await ctx.api.getFile(element.image_id)
-                    await file.download(path.join(__dirname, "..", "..", "uploads", "files", element.file_id + ".jpg"))
+                    await fileDownloader(file)
                 }
             }
 
