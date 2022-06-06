@@ -13,7 +13,6 @@ const {
     Sequelize
 } = require("sequelize")
 const { nextTick } = require("process")
-const { fileDownloader } = require("../../modules/get_download")
 const path = require("path")
 const {
     users,
