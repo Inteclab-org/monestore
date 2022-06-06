@@ -194,16 +194,30 @@ async function tgBot() {
     const router = new Router((ctx) => ctx.session.step)
 
     bot.hears(["Bekor qilish", "RU Bekor qilish"], async (ctx) => {
-        await cancelOrderProccess(ctx)
-        ctx.session.step = "menu"
-        await sendMenu(ctx)
-        await updateUserStep(ctx, ctx.session.step)
+        switch (ctx.session.step) {
+            case "order":
+                await cancelOrderProccess(ctx)
+                ctx.session.step = "menu"
+                await sendMenu(ctx)
+                await updateUserStep(ctx, ctx.session.step)
+                break;
+        
+            default:
+                break;
+        }
     })
     bot.hears(["Tasdiqlash", "RU Tasdiqlash"], async (ctx) => {
-        let v = await endOrderProccess(ctx)
-        if (!v) return
-        ctx.session.step = "verify"
-        await updateUserStep(ctx, ctx.session.step)
+        switch (ctx.session.step) {
+            case "order":
+                let v = await endOrderProccess(ctx)
+                if (!v) return
+                ctx.session.step = "verify"
+                await updateUserStep(ctx, ctx.session.step)
+                break;
+        
+            default:
+                break;
+        }
     })
     bot.hears(["Ha", "RU Ha"], async (ctx) => {
         switch (ctx.session.step) {
