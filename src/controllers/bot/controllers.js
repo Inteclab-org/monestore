@@ -21,6 +21,8 @@ const {
     transactions
 } = sequelize.models
 
+import { FileFlavor, hydrateFiles } from "@grammyjs/files";
+
 module.exports = class Controllers {
 
     static async updateUserStep(ctx, step) {
@@ -886,7 +888,7 @@ module.exports = class Controllers {
                         ...element,
                         order_id: order.id
                     })
-                    let file = await ctx.getFile(element.image_id)
+                    let file = await ctx.api.getFile(element.image_id)
                     await file.download(path.join(__dirname, "..", "..", "uploads", "files", element.file_id + ".jpg"))
                 }
             }
