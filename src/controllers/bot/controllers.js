@@ -223,7 +223,6 @@ module.exports = class Controllers {
 
             for (const s of statuses) {
                 if(order.status != 5 && order.status == s){
-                    console.log(s);
                     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                         text: messages[ctx.session.user.lang].statusMessages[s],
                         show_alert: true
@@ -558,7 +557,6 @@ module.exports = class Controllers {
             if (ctx.session.order[query.item_id].amount != undefined) {
                 text = ctx.callbackQuery.message[mType].replace(`Miqdor: ${ctx.session.order[query.item_id].amount}`, `Miqdor: ${query.value}`)
                 text = text.replace("✏️", "✅")
-                console.log(text);
             }
 
             ctx.session.order[query.item_id].amount = query.value

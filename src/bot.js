@@ -274,6 +274,7 @@ async function tgBot() {
     })
 
     router.route("menu", async (ctx) => {
+        await ctx.deleteMessage()
         await sendMenu(ctx)
     })
 
