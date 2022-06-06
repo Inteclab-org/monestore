@@ -346,7 +346,7 @@ module.exports = class Controllers {
             `Buyurtmalar: \n\n ${ordersText}`, {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
-                reply_markup: InlineKeyboards.menu_switch(offset, "orders")
+                reply_markup: InlineKeyboards[ctx.session.user.lang].menu_switch(offset, "orders")
             })
 
         await ctx.answerCallbackQuery()
