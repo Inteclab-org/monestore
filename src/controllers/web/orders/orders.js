@@ -116,7 +116,7 @@ class OrdersController{
                 raw: true
             })
 
-            await sendCost(user.telegram_id, params.id, body.cost, body.text)
+            await sendCost(user, params.id, body.cost, body.text)
 
             res.status(200).json({
                 ok: true,
@@ -203,7 +203,7 @@ class OrdersController{
                 raw: true
             })
 
-            await sendVerification(user.telegram_id, body.is_paid)
+            await sendVerification(user, body.is_paid)
 
             res.status(200).json({
                 ok: true,

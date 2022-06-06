@@ -96,6 +96,7 @@ const messages = {
     pleaseWaitMsg: "Iltimos, kuting.",
     paymentVerifiedMsg: `To'lov tasdiqlandi✅`,
     paymentNotVerifiedMsg: `To'lov tadiqlanmadi❌`,
+    costSetMsg: (order_id, cost, text) => `${order_id}-buyurtmangizning umumiy narxi <b>${cost}</b> so'm etib belgilandi. \nQo'shimcha izoh: ${text ? `<b>${text}</b>` : "mavjud emas"}. \nTo'lovni tasdiqlovchi rasmni jo'nating.`,
     statusMessages: {
       "1": "Oxirgi buyurtmangizga hali narx belgilanmadi!",
       "2": "Oxirgi buyurtmangizga to'lov qilinmagan. Iltimos, to'lovni tasdiqlovchi rasmni jo'naiting!",

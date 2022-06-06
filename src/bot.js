@@ -433,15 +433,15 @@ async function tgBot() {
     bot.start()
 }
 
-async function sendCost(user_chat_id, order_id, cost, text){
-    await bot.api.sendMessage(user_chat_id, `${order_id}-buyurtmangizning umumiy narxi <b>${cost}</b> so'm etib belgilandi. \nQo'shimcha izoh: ${text ? `<b>${text}</b>` : "mavjud emas"}. \nTo'lovni tasdiqlovchi rasmni jo'nating.`, {
+async function sendCost(user, order_id, cost, text){
+    await bot.api.sendMessage(user.telegram_id, messages[user.language_code].costSetMsg(order_id, cost, text), {
         parse_mode: "HTML"
     })
 }
 
-async function sendVerification(user_chat_id, valid){
-    let text = valid ? messages[ctx.session].paymentVerifiedMsg : messages[ctx.session].paymentNotVerifiedMsg
-    await bot.api.sendMessage(user_chat_id, text, {
+async function sendVerification(user, valid){
+    let text = valid ? messages[user.language_code].paymentVerifiedMsg : messages[user.language_code].paymentNotVerifiedMsg
+    await bot.api.sendMessage(user.telegram_id, text, {
         parse_mode: "HTML",
         reply_markup: {
             remove_keyboard: valid
