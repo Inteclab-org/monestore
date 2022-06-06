@@ -11,22 +11,40 @@ class OrdersController{
             const limit = query.limit || 20
             const page = query.page - 1 || 0
             const offset = page * limit
+            const status = query.status 
 
-            const allOrders = await orders.findAndCountAll({
+            let conditions = {}
+
+            if (status != null && status != undefined) {
+                conditions.status = status
+            }
+
+            const allOrders = await orders.findAll({
                 limit: limit,
                 offset: offset,
+                where: conditions,
                 include: [
                     {
                         model: users
+                    },
+                    {
+                        model: order_items,
+                        attributes: ["order_id"]
                     }
+                ],
+                order: [
+                    ["updated_at", "DESC"]
                 ]
+            })
+            const count = await orders.count({
+                where: conditions
             })
 
             res.status(200).json({
                 ok: true,
                 data: {
                     orders: allOrders.rows,
-                    count: allOrders.count
+                    count: count
                 }
             })
         } catch (error) {
@@ -48,6 +66,9 @@ class OrdersController{
                     },
                     {
                         model: order_items
+                    },
+                    {
+                        model: transactions
                     }
                 ]
             })
@@ -102,6 +123,36 @@ class OrdersController{
         try {
             const { query, params, body } = req
 
+            const o = await orders.findOne({
+                where: {
+                    id: params.id
+                },
+                include: [
+                    {
+                        model: transactions
+                    }
+                ],
+                order: [
+                    [transactions, "created_at", "DESC"]
+                ]
+            })
+
+            if(!o.payment_image_id){
+                res.status(200).json({
+                    ok: false,
+                    message: "Order has no payment image!"
+                })
+                return
+            }
+
+            if(body.is_paid && o.transactions[0].valid){
+                res.status(200).json({
+                    ok: false,
+                    message: "Payment already verified!"
+                })
+                return
+            }
+
             let status = body.is_paid == true ? 4 : 2
             
             const order = await orders.update({
@@ -118,6 +169,7 @@ class OrdersController{
             const transaction = await transactions.create({
                 order_id: order[1][0].dataValues.id,
                 price: order[1][0].dataValues.price,
+                text: body.text,
                 valid: body.is_paid,
             })
 

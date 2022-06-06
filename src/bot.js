@@ -421,7 +421,7 @@ async function sendCost(user_chat_id, order_id, cost, text){
 }
 
 async function sendVerification(user_chat_id, valid){
-    let text = valid ? `To'lov tasdiqlanidi✅` : `To'lov tadiqlanmadi❌`
+    let text = valid ? messages[ctx.session].paymentVerifiedMsg : messages[ctx.session].paymentNotVerifiedMsg
     await bot.api.sendMessage(user_chat_id, text, {
         parse_mode: "HTML",
         reply_markup: {

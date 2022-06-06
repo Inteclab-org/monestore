@@ -94,6 +94,8 @@ const messages = {
     imageRequiredMsg: "RU Rasm jo'natishingiz kerak!",
     paymentNotCheckedMsg: "RU Avvalgi to'lov hali adminlar tomonidan ko'rib chiqilmagan. Iltimos, javobni kuting.",
     pleaseWaitMsg: "Iltimos, kuting.",
+    paymentVerifiedMsg: `To'lov tasdiqlandi✅`,
+    paymentNotVerifiedMsg: `To'lov tadiqlanmadi❌`,
     statusMessages: {
       "1": "Oxirgi buyurtmangizga hali narx belgilanmadi!",
       "2": "Oxirgi buyurtmangizga to'lov qilinmagan. Iltimos, to'lovni tasdiqlovchi rasmni jo'naiting!",
