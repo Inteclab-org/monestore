@@ -58,10 +58,10 @@ const {
 const { FileFlavor, hydrateFiles } = require("@grammyjs/files");
 
 
+const bot = new Bot(configs.TG_TOKEN);
+bot.use(hydrateFiles(configs.TG_TOKEN))
 
 async function tgBot() {
-    const bot = new Bot(configs.TG_TOKEN);
-    bot.use(hydrateFiles(configs.TG_TOKEN))
     bot.use(session({
         initial: () => ({
             step: "idle",
