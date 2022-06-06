@@ -192,6 +192,17 @@ class OrdersController{
                 }
             })
 
+            if(body.is_paid){
+                await users.update({
+                    step: "menu" 
+                },{
+                    where: {
+                        id: order[1][0].dataValues.user_id
+                    },
+                    raw: true
+                })
+            }
+
             const user = await users.findOne({
                 where: {
                     id: order[1][0].dataValues.user_id
