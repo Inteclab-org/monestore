@@ -918,22 +918,6 @@ module.exports = class Controllers {
         })
     }
 
-    static async cancelOrderProccess(ctx) {
-        try {
-            ctx.session.order = {}
-            await cleanMessages(ctx)
-
-            await ctx.reply(messages[ctx.session.user.lang].orderProccessCancelledMsg, {
-                parse_mode: "HTML",
-                reply_markup: {
-                    remove_keyboard: true
-                }
-            })
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
     static async getPaymentImage(ctx) {
         try {
 

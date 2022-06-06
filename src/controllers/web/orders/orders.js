@@ -22,7 +22,12 @@ class OrdersController{
             const allOrders = await orders.findAll({
                 limit: limit,
                 offset: offset,
-                where: conditions,
+                where: {
+                    ...conditions,
+                    status: {
+                        [Op.ne]: 0
+                    }
+                },
                 include: [
                     {
                         model: users
