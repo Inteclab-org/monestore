@@ -146,7 +146,7 @@ class OrdersController{
             })
 
             if(!o.payment_image_id){
-                res.status(200).json({
+                res.status(400).json({
                     ok: false,
                     message: "Order has no payment image!"
                 })
@@ -156,7 +156,7 @@ class OrdersController{
             console.log(o.transactions);
 
             if(body.is_paid && o.transactions[0].valid){
-                res.status(200).json({
+                res.status(400).json({
                     ok: false,
                     message: "Payment already verified!"
                 })
