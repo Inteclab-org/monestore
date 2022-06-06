@@ -101,6 +101,14 @@ class OrdersController{
                 returning: true
             })
 
+            await transactions.update({
+                price: body.cost
+            },{
+                where: {
+                    order_id: params.id
+                }
+            })
+
             const user = await users.findOne({
                 where: {
                     id: order[1][0].dataValues.user_id
@@ -168,11 +176,24 @@ class OrdersController{
                 returning: true
             })
 
-            const transaction = await transactions.create({
-                order_id: order[1][0].dataValues.id,
-                price: order[1][0].dataValues.price,
+            const transaction = await transactions.findAll({
+                limit: 1,
+                where:{
+                    order_id: params.id
+                },
+                order: [
+                    ["created_at", "DESC"]
+                ],
+                raw: true
+            })
+
+            await transactions.update({
                 text: body.text,
                 valid: body.is_paid,
+            },{
+                where:{
+                    id: transaction[0].id
+                }
             })
 
             const user = await users.findOne({

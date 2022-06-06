@@ -49,7 +49,10 @@ const messages = require('./assets/messages')
 const InlineKeyboards = require('./assets/inline_keyboard')
 
 const {
-    users
+    users,
+    orders,
+    order_items,
+    transactions
 } = sequelize.models
 
 const bot = new Bot(configs.TG_TOKEN);

@@ -16,7 +16,8 @@ const { nextTick } = require("process")
 const {
     users,
     orders,
-    order_items
+    order_items,
+    transactions
 } = sequelize.models
 
 module.exports = class Controllers {
@@ -969,7 +970,13 @@ module.exports = class Controllers {
             }, {
                 where: {
                     id: user.current_order_id
-                }
+                },
+                returning: true
+            })
+
+            const transaction = await transactions.create({
+                order_id: updated_order[1][0].dataValues.id,
+                price: updated_order[1][0].dataValues.price
             })
 
             await ctx.reply(messages[ctx.session.user.lang].waitVerificationMsg, {
