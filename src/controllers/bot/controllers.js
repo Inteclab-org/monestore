@@ -952,6 +952,13 @@ module.exports = class Controllers {
                 }
             })
 
+            if (order && !order.price) {
+                await ctx.reply(messages[ctx.session.user.lang].noCostMsg, {
+                    parse_mode: "HTML"
+                })
+                return false
+            }
+
             if (order && order.payment_pending) {
                 await ctx.reply(messages[ctx.session.user.lang].paymentNotCheckedMsg, {
                     parse_mode: "HTML"
