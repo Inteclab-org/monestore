@@ -91,7 +91,7 @@ async function tgBot() {
         { command: "/menu", description: "Show help text" },
     ]);
 
-    bot.command("menu", async (ctx) => {
+    bot.command("menu", async (ctx, next) => {
         const chat_id = ctx.msg.chat.id
         let user = await users.findOne({
             where: {
@@ -105,6 +105,7 @@ async function tgBot() {
         }else{
             await ctx.reply("Siz ro'yxatdan o'tmagansiz!\nYou are not registered!")
         }
+        next()
     })
 
     bot.command("start", async (ctx, next) => {
@@ -311,6 +312,8 @@ async function tgBot() {
                 id: user.current_order_id
             }
         })
+
+        console.log(order.is_paid);
 
         if(order.is_paid){
             ctx.session.step = "menu"
