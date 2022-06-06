@@ -145,6 +145,8 @@ class OrdersController{
                 return
             }
 
+            console.log(o.transactions);
+
             if(body.is_paid && o.transactions[0].valid){
                 res.status(200).json({
                     ok: false,
