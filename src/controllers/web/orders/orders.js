@@ -13,10 +13,19 @@ class OrdersController{
             const offset = page * limit
             const status = query.status 
 
-            let conditions = {}
+            let conditions = {
+                status: {
+                    [Op.ne]: 0
+                }
+            }
 
             if (status && status != null && status != undefined) {
-                conditions.status = status
+                conditions.status = {
+                    [Op.and]: {
+                        [Op.ne]: 0,
+                        [Op.eq]: status,
+                    }
+                }
             }
 
             const allOrders = await orders.findAll({
@@ -24,9 +33,6 @@ class OrdersController{
                 offset: offset,
                 where: {
                     ...conditions,
-                    status: {
-                        [Op.ne]: 0
-                    }
                 },
                 include: [
                     {
@@ -102,7 +108,7 @@ class OrdersController{
             if(o.status == 0){
                 res.status(400).json({
                     ok: false,
-                    message: "Order was cancelled!"
+                    message: "Order was cancelled by client!"
                 })
                 return
             }
@@ -161,6 +167,14 @@ class OrdersController{
                     [transactions, "created_at", "DESC"]
                 ]
             })
+
+            if(o.status == 0){
+                res.status(400).json({
+                    ok: false,
+                    message: "Order was cancelled by client!"
+                })
+                return
+            }
 
             if(!o.payment_image_id){
                 res.status(400).json({
@@ -243,6 +257,21 @@ class OrdersController{
     static async UpdateStatus(req, res, next) {
         try {
             const { params, body } = req
+
+            const o = await orders.findOne({
+                where: {
+                    id: params.id
+                }
+            })
+
+            if(o.status == 0){
+                res.status(400).json({
+                    ok: false,
+                    message: "Order was cancelled by client!"
+                })
+                return
+            }
+
             
             const order = await orders.update({
                 status: body.status
