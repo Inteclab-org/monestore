@@ -249,7 +249,8 @@ class OrdersController{
             },{
                 where: {
                     id: params.id
-                }
+                },
+                returning: true
             })
 
             if(body.status == 5){
