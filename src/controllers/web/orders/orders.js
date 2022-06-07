@@ -13,19 +13,23 @@ class OrdersController{
             const offset = page * limit
             const status = query.status 
 
-            let conditions = {
-                status: {
-                    [Op.ne]: 0
-                }
-            }
+            let conditions = {}
 
             if (status && status != null && status != undefined) {
-                conditions.status = {
-                    [Op.and]: {
-                        [Op.ne]: 0,
-                        [Op.eq]: status,
+
+                if(status == 0){
+                    conditions = {
+                        status: status,
+                    }
+                }else{
+                    conditions = {
+                        [Op.and]: {
+                            status: {[Op.ne]: 0},
+                            status: status,
+                        }
                     }
                 }
+                
             }
 
             const allOrders = await orders.findAll({
