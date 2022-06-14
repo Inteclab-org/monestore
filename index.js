@@ -9,7 +9,6 @@ const app = require("./src/server");
         await sequelize.sync({
             force: false
         })
-        await sequelize.sync()
         await init()
 
     } catch (error) {
