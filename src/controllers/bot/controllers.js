@@ -883,6 +883,7 @@ module.exports = class Controllers {
                     const element = ordersObj[key];
                     const order_item = await order_items.create({
                         ...element,
+                        image_id: element.image_id + ".jpg",
                         order_id: order.id
                     })
                     if (element.image_id) {
