@@ -43,7 +43,7 @@ const messages = {
     cannotOrderMsg: "Hozircha yangi buyurtma bera olmaysiz.",
     pleaseWaitMsg: "Iltimos, kuting.",
     paymentVerifiedMsg: `To'lov tasdiqlandi✅\nOperatorlarimiz tez orada aloqaga chiqishadi.`,
-    paymentNotVerifiedMsg: `To'lov tasdiqlanmadi❌\n\n❗️ To'lovni to'g'ri amalga oshirilganiga ishonch hosil qiling va rasmni qayta jo'nating`,
+    paymentNotVerifiedMsg: `To'lov tasdiqlanmadi❌\n\n❗️ To'lov to'g'ri amalga oshirilganiga ishonch hosil qiling va rasmni qayta jo'nating`,
     noCostMsg: `Buyurtmaga hali narx belgilanmadi❌`,
     costSetMsg: (order_id, cost, text) => `${order_id}-buyurtmangizning umumiy narxi <b>${cost}</b> so'm etib belgilandi. \nQo'shimcha izoh: ${text ? `<b>${text}</b>` : "mavjud emas"}. \nTo'lovni tasdiqlovchi rasmni jo'nating.`,
     statusMessages: {
