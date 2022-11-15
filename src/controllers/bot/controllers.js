@@ -964,11 +964,11 @@ module.exports = class Controllers {
             }
 
             const file = await ctx.getFile()
-            const file_id = file.file_id + ".jpg"
+            const file_id = file.file_id
             await fileDownloader(file, file_id)
             
             const updated_order = await orders.update({
-                payment_image_id: file_id,
+                payment_image_id: file_id + ".jpg",
                 payment_pending: true,
                 status: 3
             }, {
@@ -980,7 +980,7 @@ module.exports = class Controllers {
 
             const transaction = await transactions.create({
                 order_id: updated_order[1][0].dataValues.id,
-                image_id: file_id,
+                image_id: file_id + ".jpg",
                 price: updated_order[1][0].dataValues.price
             })
             
