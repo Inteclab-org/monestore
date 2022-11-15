@@ -219,7 +219,7 @@ module.exports = class Controllers {
         })
 
         if (order) {
-            let statuses = [1,2,3,4]
+            let statuses = [1,2,3]
 
             for (const s of statuses) {
                 if(order.status != 5 && order.status == s){

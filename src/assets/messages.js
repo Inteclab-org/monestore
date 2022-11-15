@@ -49,8 +49,7 @@ const messages = {
     statusMessages: {
       "1": "Hozirgi buyurtmangizga hali narx belgilanmadi!",
       "2": "Hozirgi buyurtmangizga to'lov qilinmagan. Iltimos, to'lovni tasdiqlovchi rasmni jo'naiting!",
-      "3": "Hozirgi buyurtmangizga qilingan to'lov hali tasdiqlanmadi!",
-      "4": "Hozirgi buyurtmangiz hali yetkazib berilmadi!",
+      "3": "Hozirgi buyurtmangizga qilingan to'lov hali tasdiqlanmadi!"
     }
   },
   ru: {
@@ -102,8 +101,7 @@ const messages = {
     statusMessages: {
       "1": "Цена для вашего текущего заказа еще не установлена!",
       "2": "Ваш текущий заказ не оплачен. Пожалуйста, пришлите фото, подтверждающее оплату!",
-      "3": "Оплата вашего текущего заказа еще не подтверждена!",
-      "4": "Ваш текущий заказ еще не доставлен!",
+      "3": "Оплата вашего текущего заказа еще не подтверждена!"
     }
   }
 }
