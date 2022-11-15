@@ -260,6 +260,8 @@ module.exports = class Controllers {
         })
         ctx.session.last_sent_link_message = x.message_id
         await ctx.answerCallbackQuery()
+
+        return true
     }
 
     static async openSettingsMenu(ctx) {
