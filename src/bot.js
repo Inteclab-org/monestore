@@ -159,9 +159,6 @@ async function tgBot() {
         }
 
         ctx.session.step = user.step
-        if (user.step != "menu") {
-            await ctx.reply("Asosiy menyuga o'tish uchun /menu buyrug'ini kiriting")
-        }
         if (user.step == "menu") {
             await sendMenu(ctx)
         }
