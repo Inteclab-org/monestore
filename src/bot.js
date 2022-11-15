@@ -354,7 +354,8 @@ async function tgBot() {
                 await updateUserStep(ctx, ctx.session.step)
                 break;
             case "new_order":
-                await openOrderMenu(ctx)
+                const x = await openOrderMenu(ctx)
+                if(!x) return
                 ctx.session.step = "order"
                 await updateUserStep(ctx, ctx.session.step)
                 break;

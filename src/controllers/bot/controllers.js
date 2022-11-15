@@ -227,7 +227,7 @@ module.exports = class Controllers {
                         text: messages[ctx.session.user.lang].statusMessages[s]+messages[ctx.session.user.lang].cannotOrderMsg,
                         show_alert: true
                     })
-                    return
+                    return false
                 }
             }
         }
