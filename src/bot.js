@@ -159,8 +159,12 @@ async function tgBot() {
         }
 
         ctx.session.step = user.step
+
         if (user.step == "menu") {
             await sendMenu(ctx)
+        }
+        if (user.step == "payment") {
+            await ctx.reply("❗️ Hozirgi buyurtmangizga to'lov qilinmagan. Iltimos, to'lovni tasdiqlovchi rasmni jo'naiting!")
         }
     })
 
