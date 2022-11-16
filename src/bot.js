@@ -74,6 +74,7 @@ async function tgBot() {
             },
             messages_to_delete: [],
             last_sent_link_message: null,
+            payment_image_received: false,
             order: {},
             editing_item: {
                 item_id: null,
@@ -164,7 +165,17 @@ async function tgBot() {
             await sendMenu(ctx)
         }
         if (user.step == "payment") {
-            await ctx.reply("❗️ Hozirgi buyurtmangizga to'lov qilinmagan. Iltimos, to'lovni tasdiqlovchi rasmni jo'naiting!")
+            const order = await orders.findOne({
+                where: {
+                    id: user.current_order_id
+                },
+                raw: true
+            })
+            if (order.payment_pending == false) {
+                await ctx.reply(messages[user.language_code].paymentNotCheckedMsg)
+            }else{
+                await ctx.reply(messages[user.language_code].waitVerificationMsg)
+            }
         }
     })
 
@@ -302,6 +313,7 @@ async function tgBot() {
 
     router.route("payment", async (ctx) => {
         let a = await getPaymentImage(ctx)
+        ctx.getFile()
         // if (!a) return
     })
 
