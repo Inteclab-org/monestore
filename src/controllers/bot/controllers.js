@@ -963,6 +963,12 @@ module.exports = class Controllers {
                     keyboard: Keyboards[ctx.session.user.lang].cancel_order.build()
                 }
             })
+            await ctx.reply(`${messages[ctx.session.user.lang].waitCostMsg}`, {
+                parse_mode: "HTML",
+                reply_markup: {
+                    inline_keyboard: InlineKeyboards[ctx.session.user.lang].set_cost.inline_keyboard
+                }
+            })
         } catch (error) {
             console.log(error);
         }
