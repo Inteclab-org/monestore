@@ -414,7 +414,7 @@ async function tgBot() {
                 break
             case "set_cost":
                 await getManualCost(ctx)
-                ctx.session.step = "amount"
+                ctx.session.step = "cost"
                 await updateUserStep(ctx, ctx.session.step)
                 break
             case "manual_amount":
