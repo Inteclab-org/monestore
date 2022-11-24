@@ -1045,6 +1045,7 @@ module.exports = class Controllers {
                 where: {
                     id: user.current_order_id
                 },
+                returning: true
             })
 
             await transactions.update({
