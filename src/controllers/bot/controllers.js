@@ -409,6 +409,16 @@ module.exports = class Controllers {
                 Controllers.openMyOrdersMenu(ctx)
                 break;
         
+            case "payment":
+                await ctx.editMessageText(messages[ctx.session.user.lang].waitCostMsg, {
+                    parse_mode: "HTML",
+                    message_id: ctx.callbackQuery.message.message_id,
+                    reply_markup: InlineKeyboards[ctx.session.user.lang].set_cost
+                })
+                ctx.session.step = "payment"
+                await updateUserStep(ctx, ctx.session.step)
+                break;
+        
             default:
                 break;
         }
@@ -488,7 +498,8 @@ module.exports = class Controllers {
             //     console.log(ctx.session.step);
             //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
             //         text: messages[ctx.session.user.lang].notOrderingMsg,
-            //         show_alert: true
+            //         show_alert: true,
+            //         parse_mode: "HTML"
             //     })
             //     return
             // }
@@ -542,7 +553,8 @@ module.exports = class Controllers {
             // if(ctx.session.step != "order"  && ctx.session.step != "amount"){
             //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
             //         text: messages[ctx.session.user.lang].notOrderingMsg,
-            //         show_alert: true
+            //         show_alert: true,
+            //          parse_mode: "HTML"
             //     })
             //     return
             // }
@@ -611,7 +623,8 @@ module.exports = class Controllers {
             if (ctx.session.step != "order") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].notOrderingMsg,
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
@@ -661,7 +674,8 @@ module.exports = class Controllers {
             if (ctx.session.step != "order") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].notOrderingMsg,
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
@@ -700,10 +714,11 @@ module.exports = class Controllers {
                 return
             }
 
-            if (ctx.session.step != "order") {
+            if (ctx.session.step != "payment") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].notOrderingMsg,
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
@@ -733,9 +748,19 @@ module.exports = class Controllers {
                 })
                 return
             }
+            if (order.is_paid) {
+                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                    text: messages[ctx.session.user.lang].notOrderingMsg,
+                    show_alert: true,
+                    parse_mode: "HTML"
+                })
+                return
+            }
 
-            await ctx.reply(messages[ctx.session.user.lang].amountMsg, {
-                reply_to_message_id: ctx.callbackQuery.message.message_id
+            await ctx.editMessage(messages[ctx.session.user.lang].costMsg, {
+                parse_mode: "HTML",
+                message_id: ctx.callbackQuery.message.message_id,
+                reply_markup: InlineKeyboards.uz.back("payment")
             })
 
             await ctx.answerCallbackQuery()
