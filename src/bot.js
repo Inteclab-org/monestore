@@ -43,7 +43,9 @@ const {
     sendCurrentOrder,
     cancelOrder,
     getManualSize,
-    setManualSize
+    setManualSize,
+    setCost,
+    getManualCost
 } = require('./controllers/bot/controllers')
 const messages = require('./assets/messages')
 const InlineKeyboards = require('./assets/inline_keyboard')
@@ -311,10 +313,15 @@ async function tgBot() {
         await updateUserStep(ctx, ctx.session.step)
     })
 
+    router.route("cost", async (ctx) => {
+        let a = await setCost(ctx)
+        if (!a) return
+        ctx.session.step = "payment"
+        await updateUserStep(ctx, ctx.session.step)
+    })
+
     router.route("payment", async (ctx) => {
         let a = await getPaymentImage(ctx)
-        ctx.getFile()
-        // if (!a) return
     })
 
     router.route(`edit_user_info:name`, async (ctx) => {
@@ -403,6 +410,9 @@ async function tgBot() {
                 break
             case "set_amount":
                 await setItemAmount(ctx)
+                break
+            case "set_cost":
+                await getManualCost(ctx)
                 break
             case "manual_amount":
                 await getManualAmount(ctx)

@@ -143,7 +143,7 @@ class OrdersController{
                 raw: true
             })
 
-            await sendCost(user, params.id, body.cost, body.text)
+            await sendCost(user, params.id, order[1][0].dataValues.price, body.text)
 
             res.status(200).json({
                 ok: true,

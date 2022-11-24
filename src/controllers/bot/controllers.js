@@ -686,6 +686,64 @@ module.exports = class Controllers {
         }
     }
 
+    static async getManualCost(ctx) {
+        try {
+            const {
+                query
+            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+
+            if (ctx.session.step == "verfiy") {
+                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                    text: messages[ctx.session.user.lang].isVerifyingMsg,
+                    show_alert: true
+                })
+                return
+            }
+
+            if (ctx.session.step != "order") {
+                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                    text: messages[ctx.session.user.lang].notOrderingMsg,
+                    show_alert: true
+                })
+                return
+            }
+
+            const user = await users.findOne({
+                where: {
+                    id: ctx.session.user.id
+                },
+                raw: true
+            })
+
+            const order = await orders.findOne({
+                where: {
+                    id: user.current_order_id
+                }
+            })
+
+            if (order.price) {
+                const msg = order.payment_pending 
+                    ? messages[ctx.session.user.lang].orderHasPriceMsg
+                    : messages[ctx.session.user.lang].orderHasPriceMsg 
+                        + messages[ctx.session.user.lang].notPaidMsg;
+
+                await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                    text: msg,
+                    show_alert: true
+                })
+                return
+            }
+
+            await ctx.reply(messages[ctx.session.user.lang].amountMsg, {
+                reply_to_message_id: ctx.callbackQuery.message.message_id
+            })
+
+            await ctx.answerCallbackQuery()
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     static async setManualSize(ctx) {
         try {
 
@@ -910,6 +968,50 @@ module.exports = class Controllers {
         }
     }
 
+    static async setCost(ctx){
+        try {
+            if (isNaN(ctx.msg.text)) {
+                let m = await ctx.reply(messages[ctx.session.user.lang].notNumberMsg)
+                ctx.session.messages_to_delete.push(m.message_id)
+                ctx.session.messages_to_delete.push(ctx.msg.message_id)
+                return false
+            }
+
+            const user = await users.findOne({
+                where: {
+                    id: ctx.session.user.id
+                },
+                raw: true
+            })
+
+            const order = await orders.update({
+                price: Number(ctx.msg.text),
+                status: 2
+            },{
+                where: {
+                    id: user.current_order_id
+                },
+            })
+
+            await transactions.update({
+                price: Number(ctx.msg.text)
+            },{
+                where: {
+                    order_id: user.current_order_id
+                }
+            })
+
+            await ctx.reply(messages[user.language_code].costSetMsg(user.current_order_id, order[1][0].dataValues.price), {
+                parse_mode: "HTML"
+            })
+
+            await cleanMessages(ctx)
+            return true
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     static async continueOrderProccess(ctx) {
         await ctx.reply(`${messages[ctx.session.user.lang].verifyStoppedMsg} 
         ${ messages[ctx.session.user.lang].continueOrderMsg}`, {
@@ -987,7 +1089,8 @@ module.exports = class Controllers {
             })
             
             await ctx.reply(messages[ctx.session.user.lang].waitVerificationMsg, {
-                parse_mode: "HTML"
+                parse_mode: "HTML",
+                inline_keyboard: InlineKeyboards[ctx.session.user.lang].set_cost.inline_keyboard
             })
 
         } catch (error) {

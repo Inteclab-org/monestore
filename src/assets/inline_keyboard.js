@@ -14,6 +14,9 @@ const InlineKeyboards = {
             .text("⚙️ Sozlamalar", "settings")
             .text("📦 Buyurtmalar", "my_orders"),
 
+        set_cost: new InlineKeyboard()
+            .text("Narx belgilash", "set_cost"),
+
         menu_switch: (offset, step) => new InlineKeyboard()
             .text("◀️", `prev?offset=${Number(offset) - 1}`)
             .text("▶️", `next?offset=${Number(offset) + 1}`)
