@@ -757,7 +757,7 @@ module.exports = class Controllers {
                 return
             }
 
-            await ctx.editMessage(messages[ctx.session.user.lang].costMsg, {
+            await ctx.editMessageText(messages[ctx.session.user.lang].costMsg, {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
                 reply_markup: InlineKeyboards.uz.back("payment")
