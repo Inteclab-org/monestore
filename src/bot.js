@@ -213,6 +213,7 @@ async function tgBot() {
     bot.hears(["Bekor qilish", "Отмена"], async (ctx) => {
         switch (ctx.session.step) {
             case "order":
+            case "payment":
                 await cancelOrderProccess(ctx)
                 ctx.session.step = "menu"
                 await sendMenu(ctx)
