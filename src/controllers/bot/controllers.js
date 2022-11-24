@@ -876,7 +876,30 @@ module.exports = class Controllers {
     static async cancelOrderProccess(ctx) {
         try {
             ctx.session.order = {}
-            await cleanMessages(ctx)
+
+            const user = await users.findOne({
+                where: {
+                    telegram_id: ctx.session.user.id
+                },
+                raw: true
+            })
+
+            const order = await orders.findOne({
+                where: {
+                    id: user.current_order_id
+                },
+                raw: true
+            })
+
+            if (order) {
+                await orders.update({
+                    status: 0
+                },{
+                    where: {
+                        id: order.id
+                    }
+                })
+            }
 
             await ctx.reply(messages[ctx.session.user.lang].orderProccessCancelledMsg, {
                 parse_mode: "HTML",

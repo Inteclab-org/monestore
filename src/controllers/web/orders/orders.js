@@ -267,15 +267,6 @@ class OrdersController{
                     id: params.id
                 }
             })
-
-            if(o.status == 0){
-                res.status(400).json({
-                    ok: false,
-                    message: "Order was cancelled by client!"
-                })
-                return
-            }
-
             
             const order = await orders.update({
                 status: body.status
