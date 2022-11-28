@@ -413,7 +413,9 @@ module.exports = class Controllers {
                 await ctx.editMessageText(messages[ctx.session.user.lang].waitCostMsg, {
                     parse_mode: "HTML",
                     message_id: ctx.callbackQuery.message.message_id,
-                    reply_markup: InlineKeyboards[ctx.session.user.lang].set_cost
+                    reply_markup: {
+                        inline_keyboard: InlineKeyboards[ctx.session.user.lang].set_cost.inline_keyboard
+                    }
                 })
                 ctx.session.step = "payment"
                 await updateUserStep(ctx, ctx.session.step)
@@ -760,7 +762,9 @@ module.exports = class Controllers {
             await ctx.editMessageText(messages[ctx.session.user.lang].costMsg, {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
-                reply_markup: InlineKeyboards.uz.back("payment")
+                reply_markup: {
+                    inline_keyboard: InlineKeyboards.uz.back("payment").inline_keyboard
+                }
             })
 
             await ctx.answerCallbackQuery()
@@ -1145,7 +1149,9 @@ module.exports = class Controllers {
             
             await ctx.reply(messages[ctx.session.user.lang].waitVerificationMsg, {
                 parse_mode: "HTML",
-                inline_keyboard: InlineKeyboards[ctx.session.user.lang].set_cost.inline_keyboard
+                reply_markup: {
+                    inline_keyboard: InlineKeyboards[ctx.session.user.lang].set_cost.inline_keyboard
+                }
             })
 
         } catch (error) {
