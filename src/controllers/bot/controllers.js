@@ -1148,10 +1148,7 @@ module.exports = class Controllers {
             })
             
             await ctx.reply(messages[ctx.session.user.lang].waitVerificationMsg, {
-                parse_mode: "HTML",
-                reply_markup: {
-                    inline_keyboard: InlineKeyboards[ctx.session.user.lang].set_cost.inline_keyboard
-                }
+                parse_mode: "HTML"
             })
 
         } catch (error) {
