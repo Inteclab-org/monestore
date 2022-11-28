@@ -238,6 +238,7 @@ async function tgBot() {
         }
     })
     bot.hears(["Ha", "Да"], async (ctx) => {
+        console.log("HA", `\n${ctx.session.step}`);
         switch (ctx.session.step) {
             case "verify":
                 await saveOrder(ctx)

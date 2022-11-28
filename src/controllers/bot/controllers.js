@@ -718,7 +718,7 @@ module.exports = class Controllers {
 
             if (ctx.session.step != "payment") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-                    text: messages[ctx.session.user.lang].notOrderingMsg,
+                    text: messages[ctx.session.user.lang].notOrderingMsg+`\n${ctx.session.step}`,
                     show_alert: true,
                     parse_mode: "HTML"
                 })
