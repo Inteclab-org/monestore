@@ -418,7 +418,7 @@ module.exports = class Controllers {
                     }
                 })
                 ctx.session.step = "payment"
-                await updateUserStep(ctx, ctx.session.step)
+                await this.updateUserStep(ctx, ctx.session.step)
                 break;
         
             default:
@@ -1100,7 +1100,7 @@ module.exports = class Controllers {
 
             if(order.is_paid){
                 ctx.session.step = "menu"
-                await updateUserStep(ctx, ctx.session.step)
+                await this.updateUserStep(ctx, ctx.session.step)
                 await sendMenu(ctx)
                 return false
             }
