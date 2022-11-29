@@ -1,5 +1,5 @@
 module.exports = async (sequelize, DataTypes) => {
-    const orders = sequelize.define("orders", {
+    const banners = sequelize.define("banners", {
         id: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -24,5 +24,5 @@ module.exports = async (sequelize, DataTypes) => {
         createdAt: 'created_at'
       })
 
-    return orders
+    return banners
 }
