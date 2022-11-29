@@ -27,11 +27,11 @@ class OrdersController{
 
     static async Create(req, res, next) {
         try {
-            if (!req.files) {
+            if (!req.files || !req.files.images) {
                 throw new res.error(400, "Files required!")
             }
 
-            const upload = await uploadFile(req.files)
+            const upload = await uploadFile(req.files.images)
             const image_src = upload.filenames[0]
 
             const banner = await banners.create({
@@ -66,8 +66,8 @@ class OrdersController{
 
             let image_src = banner.image_src
 
-            if (req.files) {
-                const upload = await uploadFile(req.files)
+            if (req.files && req.files.images) {
+                const upload = await uploadFile(req.files.images)
                 image_src = upload.filenames[0]
             }
 
