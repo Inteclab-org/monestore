@@ -8,13 +8,13 @@ module.exports.uploadFile = async (files, folder) => {
         for await (const file of files) {
             const ext = mime.extension(file['mimetype'])
             const filename = `${uuidv4() + "." + ext}`
-            await file.mv(path.join(__dirname, "..", "public", "uploads", folder, filename))
+            await file.mv(path.join(__dirname, "..", "uploads", folder, filename))
             names.push(filename)
         }
     }else {
         const ext = mime.extension(files['mimetype'])
         const filename = `${uuidv4() + "." + ext}`
-        await files.mv(path.join(__dirname, "..", "public", "uploads", folder, filename))
+        await files.mv(path.join(__dirname, "..", "uploads", folder, filename))
         names.push(filename)
     }
 
