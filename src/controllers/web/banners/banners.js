@@ -31,7 +31,7 @@ class OrdersController{
                 throw new res.error(400, "Files required!")
             }
 
-            const upload = await uploadFile(req.files.images)
+            const upload = await uploadFile(req.files.images, "landing")
             const image_src = upload.filenames[0]
 
             const banner = await banners.create({
@@ -67,7 +67,7 @@ class OrdersController{
             let image_src = banner.image_src
 
             if (req.files && req.files.images) {
-                const upload = await uploadFile(req.files.images)
+                const upload = await uploadFile(req.files.images, "landing")
                 image_src = upload.filenames[0]
             }
 
