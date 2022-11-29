@@ -8,7 +8,8 @@ const modelDefiners = [
     require('./models/orders/orders'),
     require('./models/orders/order_items'),
     require('./models/users/admin_users'),
-    require('./models/transactions/transactions')
+    require('./models/transactions/transactions'),
+    require('./models/landing/banners/banners')
 ]
 
 const sequelize = new Sequelize(configs.DB_CONNECTION_URL, {
