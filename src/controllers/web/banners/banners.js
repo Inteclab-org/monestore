@@ -7,11 +7,24 @@ const { users, banners, order_items, transactions } = sequelize.models
 class OrdersController{
     static async GetAll(req, res, next) {
         try {
-            const is_active = req.query.active ? req.query.active : true 
+            const is_active = 
+                req.query.active != undefined && req.query.active != null 
+                ? req.query.active
+                : null
+
+            let filters = {
+                is_active
+            }
+
+            if (!is_active) filters = {
+                [Op.or]: [
+                    {is_active: true},
+                    {is_active: false}
+                ]
+            }
+
             const activeBanners = await banners.findAll({
-                where: {
-                    is_active
-                }
+                where: filters
             })
 
             res.status(200).json({
