@@ -49,7 +49,7 @@ const {
 } = require('./controllers/bot/controllers')
 const messages = require('./assets/messages')
 const InlineKeyboards = require('./assets/inline_keyboard')
-
+const queryString = require('query-string')
 const {
     users,
     orders,
@@ -350,10 +350,7 @@ async function tgBot() {
 
     bot.on("callback_query:data", async (ctx) => {
 
-        const {
-            url: command,
-            query
-        } = require('query-string').parseUrl(ctx.callbackQuery.data)
+        const { url: command, query } = await queryString.parseUrl(ctx.callbackQuery.data)
 
         switch (command) {
             case "set_language":
