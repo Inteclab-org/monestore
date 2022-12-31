@@ -5,7 +5,7 @@ const InlineKeyboards = require("../../assets/inline_keyboard")
 const Keyboards = require("../../assets/keyboards")
 const messages = require("../../assets/messages")
 const sequelize = require('../../db/db')
-import queryString from "query-string"
+const queryString = require("query-string")
 
 const {
     validURL

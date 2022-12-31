@@ -49,7 +49,7 @@ const {
 } = require('./controllers/bot/controllers')
 const messages = require('./assets/messages')
 const InlineKeyboards = require('./assets/inline_keyboard')
-import queryString from "query-string"
+const queryString = require("query-string")
 
 const {
     users,
