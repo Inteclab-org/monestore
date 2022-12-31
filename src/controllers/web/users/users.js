@@ -1,5 +1,5 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+ 
+ 
 
 const { sign } = require("jsonwebtoken")
 const { Op } = require("sequelize")

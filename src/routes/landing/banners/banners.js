@@ -1,5 +1,5 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+ 
+ 
 
 const { Create, Update, GetAll } = require("../../../controllers/web/banners/banners")
 const protect = require("../../../middlewares/auth/protect")

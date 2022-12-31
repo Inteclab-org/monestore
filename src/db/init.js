@@ -1,5 +1,5 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+ 
+ 
 
 const configs = require("../config");
 const { createCrypt } = require("../modules/bcrypt");
