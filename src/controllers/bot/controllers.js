@@ -48,7 +48,7 @@ module.exports = class Controllers {
         try {
             const {
                 query
-            } = require("query-string").parseUrl(ctx.callbackQuery.data)
+            } = require("query-string").parse(ctx.callbackQuery.data)
 
             switch (query.step) {
                 case "name":
@@ -104,7 +104,7 @@ module.exports = class Controllers {
         try {
             const {
                 query
-            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+            } = require('query-string').parse(ctx.callbackQuery.data)
 
             ctx.session.user.lang = query.value
             let user = await users.update({
@@ -395,7 +395,7 @@ module.exports = class Controllers {
     static async backToMenu(ctx) {
         const {
             query
-        } = require("query-string").parseUrl(ctx.callbackQuery.data)
+        } = require("query-string").parse(ctx.callbackQuery.data)
         switch (query.step) {
             case "menu":
                 await ctx.editMessageText(messages[ctx.session.user.lang].menuMsg, {
@@ -486,7 +486,7 @@ module.exports = class Controllers {
         try {
             const {
                 query
-            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+            } = require('query-string').parse(ctx.callbackQuery.data)
 
             if (ctx.session.step == "verify") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
@@ -542,7 +542,7 @@ module.exports = class Controllers {
         try {
             const {
                 query
-            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+            } = require('query-string').parse(ctx.callbackQuery.data)
 
             if (ctx.session.step == "verify") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
@@ -604,7 +604,7 @@ module.exports = class Controllers {
         try {
             const {
                 query
-            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+            } = require('query-string').parse(ctx.callbackQuery.data)
 
             if (ctx.session.step == "size") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
@@ -655,7 +655,7 @@ module.exports = class Controllers {
         try {
             const {
                 query
-            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+            } = require('query-string').parse(ctx.callbackQuery.data)
 
             if (ctx.session.step == "amount") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
@@ -706,7 +706,7 @@ module.exports = class Controllers {
         try {
             const {
                 query
-            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+            } = require('query-string').parse(ctx.callbackQuery.data)
 
             if (ctx.session.step == "verfiy") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
@@ -851,7 +851,7 @@ module.exports = class Controllers {
         try {
             const {
                 query
-            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+            } = require('query-string').parse(ctx.callbackQuery.data)
 
             let type = "text",
                 mType = "text"
@@ -1160,7 +1160,7 @@ module.exports = class Controllers {
         try {
             const {
                 query
-            } = require('query-string').parseUrl(ctx.callbackQuery.data)
+            } = require('query-string').parse(ctx.callbackQuery.data)
 
             delete ctx.session.order[query.item_id]
 
