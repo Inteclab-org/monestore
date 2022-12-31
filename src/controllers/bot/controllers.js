@@ -1,3 +1,6 @@
+const {createRequire} = require("module")
+const require = createRequire(import.meta.url);
+
 const InlineKeyboards = require("../../assets/inline_keyboard")
 const Keyboards = require("../../assets/keyboards")
 const messages = require("../../assets/messages")

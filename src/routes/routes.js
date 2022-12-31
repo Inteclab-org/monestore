@@ -1,3 +1,6 @@
+const {createRequire} = require("module")
+const require = createRequire(import.meta.url);
+
 const FilesRouter = require('./files/files')
 const OrdersRouter = require('./orders/orders')
 const UsersRouter = require('./users/users')

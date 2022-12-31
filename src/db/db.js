@@ -1,3 +1,6 @@
+const {createRequire} = require("module")
+const require = createRequire(import.meta.url);
+
 const { Sequelize, DataTypes } = require('sequelize')
 const connections = require('./connections')
 const configs = require('../config')

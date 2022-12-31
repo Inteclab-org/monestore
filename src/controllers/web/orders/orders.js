@@ -1,3 +1,5 @@
+const {createRequire} = require("module")
+const require = createRequire(import.meta.url);
 const { Op } = require("sequelize")
 const { sendCost, sendVerification } = require("../../../bot")
 const sequelize = require("../../../db/db")

@@ -1,3 +1,6 @@
+const {createRequire} = require("module")
+const require = createRequire(import.meta.url);
+
 const { compareSync } = require("bcrypt")
 const { hashSync } = require("bcrypt")
 const { genSalt, hash, compare } = require("bcrypt")

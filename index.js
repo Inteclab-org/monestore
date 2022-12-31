@@ -1,3 +1,5 @@
+const {createRequire} = require("module")
+const require = createRequire(import.meta.url);
 const {tgBot} = require("./src/bot");
 const configs = require("./src/config");
 const sequelize = require("./src/db/db");

@@ -1,3 +1,5 @@
+const {createRequire} = require("module")
+const require = createRequire(import.meta.url);
 const {
     InlineKeyboard
 } = require("grammy");

@@ -1,3 +1,6 @@
+const {createRequire} = require("module")
+const require = createRequire(import.meta.url);
+
 const path = require("path")
 const mime = require("mime-types")
 const { v4: uuidv4 } = require("uuid");

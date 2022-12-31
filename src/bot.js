@@ -1,3 +1,5 @@
+const {createRequire} = require("module")
+const require = createRequire(import.meta.url);
 const {
     Bot,
     Context,
@@ -7,9 +9,7 @@ const {
     GrammyError,
     HttpError,
 } = require('grammy')
-const {
-    Router
-} = require('@grammyjs/router')
+const {Router} = require('@grammyjs/router')
 const configs = require('./config')
 const sequelize = require('./db/db')
 const {
@@ -50,6 +50,7 @@ const {
 const messages = require('./assets/messages')
 const InlineKeyboards = require('./assets/inline_keyboard')
 import queryString from "query-string"
+
 const {
     users,
     orders,
