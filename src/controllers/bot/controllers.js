@@ -1,4 +1,4 @@
-const {createRequire} = require("module")
+import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
 const InlineKeyboards = require("../../assets/inline_keyboard")

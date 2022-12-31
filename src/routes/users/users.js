@@ -1,4 +1,4 @@
-const {createRequire} = require("module")
+import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
 const { GetAll, Login, GenerateToken, GetAllAdmins, GetOne, GetUserOrders, Profile } = require("../../controllers/web/users/users")

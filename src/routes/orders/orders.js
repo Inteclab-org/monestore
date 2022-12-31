@@ -1,4 +1,4 @@
-const {createRequire} = require("module")
+import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
 const { GetAll, GetOne, Verification, SetCost, UpdateStatus } = require("../../controllers/web/orders/orders")
