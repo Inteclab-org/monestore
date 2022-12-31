@@ -49,7 +49,7 @@ const {
 } = require('./controllers/bot/controllers')
 const messages = require('./assets/messages')
 const InlineKeyboards = require('./assets/inline_keyboard')
-const queryString = require('query-string')
+import queryString from "query-string"
 const {
     users,
     orders,
@@ -57,11 +57,7 @@ const {
     transactions
 } = sequelize.models
 
-const { FileFlavor, hydrateFiles } = require("@grammyjs/files");
-
-
 const bot = new Bot(configs.TG_TOKEN);
-// bot.use(hydrateFiles(configs.TG_TOKEN))
 
 async function tgBot() {
     bot.use(session({
@@ -352,7 +348,7 @@ async function tgBot() {
 
         const { url: command, query } = queryString.parseUrl(ctx.callbackQuery.data)
 
-        log(command, query)
+        console.log(command, query)
 
         switch (command) {
             case "set_language":
