@@ -350,7 +350,9 @@ async function tgBot() {
 
     bot.on("callback_query:data", async (ctx) => {
 
-        const { url: command, query } = queryString.parse(ctx.callbackQuery.data)
+        const { url: command, query } = queryString.parseUrl(ctx.callbackQuery.data)
+
+        log(command, query)
 
         switch (command) {
             case "set_language":
