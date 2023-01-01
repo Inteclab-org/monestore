@@ -1,6 +1,6 @@
  
  
-const { Keyboard } = require("grammy");
+import { Keyboard } from "grammy";
 
 const Keyboards = {
     uz: {
@@ -17,4 +17,4 @@ const Keyboards = {
     }
 }
 
-module.exports = Keyboards
+export default Keyboards

@@ -1,20 +1,10 @@
  
- 
-
-const {
-    verify
-  } = require("jsonwebtoken")
-
-  const config = require("../../config")
-  const ErrorResponse = require("../../modules/error/errorResponse");
+import jwt from "jsonwebtoken"
+const { verify } = jwt
+import config from "../../config/index.js"
+import sequelize from "../../db/db.js"
   
-  const { Op } = require("sequelize");
-  
-  const {
-    models: {
-      users
-    }
-  } = require("../../db/db");
+const { users } = sequelize.models
   
   const protect = async (req, res, next) => {
     try {
@@ -69,4 +59,4 @@ const {
     }
   }
   
-  module.exports = protect
+  export default protect

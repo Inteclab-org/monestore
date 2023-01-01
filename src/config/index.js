@@ -1,8 +1,9 @@
  
  
-require('dotenv').config()
-const { env } = require('process');
-
+import { config } from 'dotenv'
+import { env } from 'process';
+config()
+console.log(env);
 const configs = {
     PORT: env.PORT,
     PASSWORD: env.PASSWORD,
@@ -18,4 +19,4 @@ const configs = {
     DB_CONNECTION_URL: `postgres://${env.DB_USER}:${env.DB_PASSWORD}@${env.DB_HOST}:${env.DB_PORT}/${env.DATABASE}`
 }
 
-module.exports = configs;
+export default configs;

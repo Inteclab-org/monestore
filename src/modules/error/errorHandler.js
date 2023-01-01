@@ -8,4 +8,4 @@ const errorHandler = (err, req, res, next) => {
     res.status(err.statusCode || 500).send(error)
 }
 
-module.exports = errorHandler
+export default errorHandler

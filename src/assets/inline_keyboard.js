@@ -1,8 +1,6 @@
  
  
-const {
-    InlineKeyboard
-} = require("grammy");
+import { InlineKeyboard } from "grammy";
 
 const InlineKeyboards = {
     select_language: new InlineKeyboard()
@@ -149,4 +147,4 @@ const InlineKeyboards = {
     }
 }
 
-module.exports = InlineKeyboards;
+export default InlineKeyboards;

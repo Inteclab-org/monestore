@@ -1,13 +1,15 @@
  
  
 
-const { Create, Update, GetAll } = require("../../../controllers/web/banners/banners")
-const protect = require("../../../middlewares/auth/protect")
+import BannersController from "../../../controllers/web/banners/banners.js"
+const { Create, Update, GetAll  } = BannersController
+import protect from "../../../middlewares/auth/protect.js"
 
-const BannersRouter = require("express").Router()
+import express from "express"
+const BannersRouter = express.Router()
 
 BannersRouter.get("/", GetAll)
 BannersRouter.post("/", protect, Create)
 BannersRouter.put("/:id", protect, Update)
 
-module.exports = BannersRouter
+export default BannersRouter

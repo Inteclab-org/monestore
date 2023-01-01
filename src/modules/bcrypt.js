@@ -1,11 +1,9 @@
-const { compareSync } = require("bcrypt")
-const { hashSync } = require("bcrypt")
-const { genSalt, hash, compare } = require("bcrypt")
+import { compareSync, hashSync } from "bcrypt"
 
-module.exports.createCrypt = (password) => {
+export const createCrypt = (password) => {
     return hashSync(password, 10)
 }
 
-module.exports.compareCrypt = (password, data) => {
+export const compareCrypt = (password, data) => {
     return compareSync(password, data)
 }

@@ -1,17 +1,15 @@
  
  
-const {
+import {
     Bot,
-    Context,
-    Keyboard,
     session,
-    SessionFlavor,
     GrammyError,
     HttpError,
-} = require('grammy')
-const {Router} = require('@grammyjs/router')
-const configs = require('./config')
-const sequelize = require('./db/db')
+} from 'grammy'
+import {Router} from '@grammyjs/router'
+import configs from './config/index.js'
+import sequelize from './db/db.js'
+import Controlers from './controllers/bot/controllers.js'
 const {
     selectLanguage,
     setLanguage,
@@ -46,10 +44,10 @@ const {
     setManualSize,
     setCost,
     getManualCost
-} = require('./controllers/bot/controllers')
-const messages = require('./assets/messages')
-const InlineKeyboards = require('./assets/inline_keyboard')
-const queryString = require("query-string")
+} = Controlers
+import messages from './assets/messages.js'
+import InlineKeyboards from './assets/inline_keyboard.js'
+import queryString from "query-string"
 
 const {
     users,
@@ -470,9 +468,15 @@ async function sendVerification(user, valid){
             remove_keyboard: valid
         }
     })
+    if (valid) {
+        await bot.api.sendMessage(user.telegram_id, messages[user.language_code].menuMsg, {
+            parse_mode: "HTML",
+            reply_markup: InlineKeyboards[user.language_code].menu
+        })
+    }
 }
 
-module.exports = {
+export {
     tgBot,
     sendCost,
     sendVerification

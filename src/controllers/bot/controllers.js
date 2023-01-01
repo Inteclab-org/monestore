@@ -1,17 +1,15 @@
  
  
 
-const InlineKeyboards = require("../../assets/inline_keyboard")
-const Keyboards = require("../../assets/keyboards")
-const messages = require("../../assets/messages")
-const sequelize = require('../../db/db')
-const queryString = require("query-string")
+import InlineKeyboards from "../../assets/inline_keyboard.js"
+import Keyboards from "../../assets/keyboards.js"
+import messages from "../../assets/messages.js"
+import sequelize from '../../db/db.js'
+import queryString from "query-string"
 
-const {
-    validURL
-} = require("../../modules/regex_url")
+import { validURL } from "../../modules/regex_url.js"
 
-const { fileDownloader } = require("../../modules/get_download")
+import { fileDownloader } from "../../modules/get_download.js"
 const {
     users,
     orders,
@@ -19,7 +17,7 @@ const {
     transactions
 } = sequelize.models
 
-module.exports = class Controllers {
+export default class Controllers {
 
     static async updateUserStep(ctx, step) {
         try {

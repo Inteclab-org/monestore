@@ -1,10 +1,9 @@
  
  
 
-const { Op } = require("sequelize")
-const { sendCost, sendVerification } = require("../../../bot")
-const sequelize = require("../../../db/db")
-const { uploadFile } = require("../../../modules/file_upload")
+import { Op } from "sequelize"
+import sequelize from "../../../db/db.js"
+import { uploadFile } from "../../../modules/file_upload.js"
 const { users, banners, order_items, transactions } = sequelize.models
 
 class OrdersController{
@@ -107,4 +106,4 @@ class OrdersController{
     
 } 
 
-module.exports = OrdersController
+export default OrdersController

@@ -1,11 +1,12 @@
  
  
 
-const { sign } = require("jsonwebtoken")
-const { Op } = require("sequelize")
-const configs = require("../../../config")
-const sequelize = require("../../../db/db")
-const { compareCrypt } = require("../../../modules/bcrypt")
+import jwt from "jsonwebtoken"
+const { sign } = jwt
+import { Op } from "sequelize"
+import configs from "../../../config/index.js"
+import sequelize from "../../../db/db.js"
+import { compareCrypt } from "../../../modules/bcrypt.js"
 const { users, admin_users } = sequelize.models
 
 class UsersController{
@@ -224,4 +225,4 @@ class UsersController{
     }
 } 
 
-module.exports = UsersController
+export default UsersController

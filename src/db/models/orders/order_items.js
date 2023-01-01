@@ -1,4 +1,4 @@
-module.exports = async (sequelize, DataTypes) => {
+export default async (sequelize, DataTypes) => {
     const order_items = sequelize.define("order_items", {
         id: {
             type: DataTypes.INTEGER,

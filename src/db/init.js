@@ -1,13 +1,13 @@
  
  
 
-const configs = require("../config");
-const { createCrypt } = require("../modules/bcrypt");
-const sequelize = require("./db");
+import configs from "../config/index.js"
+import { createCrypt } from "../modules/bcrypt.js"
+import sequelize from "./db.js"
 
 const { users, admin_users } = sequelize.models
 
-module.exports.init = async function() {
+export const init = async function() {
 
     const admins = await users.count({
         where:{

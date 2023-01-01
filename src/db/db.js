@@ -1,18 +1,25 @@
  
  
 
-const { Sequelize, DataTypes } = require('sequelize')
-const connections = require('./connections')
-const configs = require('../config')
+import { Sequelize, DataTypes } from 'sequelize'
+import connections from './connections.js'
+import configs from '../config/index.js'
+
+import Users from './models/users/users.js'         
+import Orders from './models/orders/orders.js'
+import OrderItems from './models/orders/order_items.js'
+import AdminUsers from './models/users/admin_users.js'
+import Transactions from './models/transactions/transactions.js'
+import Banners from './models/landing/banners/banners.js'
 
 
 const modelDefiners = [
-    require('./models/users/users'),
-    require('./models/orders/orders'),
-    require('./models/orders/order_items'),
-    require('./models/users/admin_users'),
-    require('./models/transactions/transactions'),
-    require('./models/landing/banners/banners')
+    Users,
+    OrderItems,
+    Orders,
+    AdminUsers,
+    Transactions,
+    Banners
 ]
 
 const sequelize = new Sequelize(configs.DB_CONNECTION_URL, {
@@ -28,4 +35,4 @@ for (const m of modelDefiners) {
 
 connections(sequelize)
 
-module.exports = sequelize;
+export default sequelize;

@@ -1,10 +1,12 @@
  
  
 
-const { GetAll, GetOne, Verification, SetCost, UpdateStatus } = require("../../controllers/web/orders/orders")
-const protect = require("../../middlewares/auth/protect")
+import OrdersController from "../../controllers/web/orders/orders.js"
+const { GetAll, GetOne, Verification, SetCost, UpdateStatus } = OrdersController
+import protect from "../../middlewares/auth/protect.js"
 
-const OrdersRouter = require("express").Router()
+import express from "express"
+const OrdersRouter = express.Router()
 
 OrdersRouter.use(protect)
 
@@ -14,4 +16,4 @@ OrdersRouter.put("/cost/:id", SetCost)
 OrdersRouter.put("/verification/:id", Verification)
 OrdersRouter.put("/status/:id", UpdateStatus)
 
-module.exports = OrdersRouter
+export default OrdersRouter

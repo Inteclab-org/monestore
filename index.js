@@ -1,12 +1,12 @@
  
  
-const {tgBot} = require("./src/bot");
-const configs = require("./src/config");
-const sequelize = require("./src/db/db");
-const { init } = require("./src/db/init");
-const app = require("./src/server");
-;
-(async () => {
+import {tgBot} from "./src/bot.js";
+import configs from "./src/config/index.js";
+import sequelize from "./src/db/db.js";
+import { init } from "./src/db/init.js";
+import app from "./src/server.js";
+
+;(async () => {
     try {
         await sequelize.sync({
             force: false

@@ -1,15 +1,20 @@
  
  
-const express = require("express");
-const path = require("path");
-const cors = require("cors");
-const configs = require('./config')
-const sequelize = require('./db/db');
-const { errorMiddleware } = require("./middlewares/error/errorMiddleware");
-const errorHandler = require("./modules/error/errorHandler");
-const fileUpload = require("express-fileupload")
-const router = require("./routes/routes");
-require("dotenv").config()
+import express from "express";
+import path from "path";
+const { dirname } = path
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+import cors from "cors";
+import { errorMiddleware } from "./middlewares/error/errorMiddleware.js";
+import errorHandler from "./modules/error/errorHandler.js";
+import fileUpload from "express-fileupload"
+import router from "./routes/routes.js";
+
+import { config } from "dotenv"
+config()
 
 const app = express();
 
@@ -27,4 +32,4 @@ app.use(cors({ origin: "*" }))
 app.use("/api", router)
 app.use(errorHandler)
 
-module.exports = app
+export default app

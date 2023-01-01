@@ -1,8 +1,8 @@
  
  
-const ErrorResponse = require("../../modules/error/errorResponse")
+import ErrorResponse from "../../modules/error/errorResponse.js"
 
-module.exports.errorMiddleware = (req, res, next) => {
+export const errorMiddleware = (req, res, next) => {
     res.error = ErrorResponse
     next()
 }

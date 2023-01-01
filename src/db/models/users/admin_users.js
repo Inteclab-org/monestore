@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
     const admin_users = sequelize.define('admin_users', {
         id: {
           type: DataTypes.UUID,

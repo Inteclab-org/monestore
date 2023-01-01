@@ -1,12 +1,17 @@
  
  
 
-const request = require("request")
-const fs = require("fs")
-const path = require("path")
-const configs = require('../config')
+import request from "request"
+import fs from "fs"
+import path from "path"
+const { dirname } = path
+import { fileURLToPath } from 'url';
 
-module.exports.fileDownloader = async function(file, file_id){
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+import configs from '../config/index.js'
+
+export const fileDownloader = async function(file, file_id){
     try {
         let url = `http://api.telegram.org/file/bot${configs.TG_TOKEN}/${file.file_path}`
 

@@ -1,4 +1,4 @@
-module.exports = (sequelize) => {
+export default (sequelize) => {
     const { users, admin_users, orders, order_items, transactions } = sequelize.models
 
     users.hasMany(orders, { foreignKey: "user_id" });
