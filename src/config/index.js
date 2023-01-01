@@ -3,7 +3,7 @@
 import { config } from 'dotenv'
 import { env } from 'process';
 config()
-console.log(env);
+
 const configs = {
     PORT: env.PORT,
     PASSWORD: env.PASSWORD,
