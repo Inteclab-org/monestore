@@ -25,7 +25,7 @@ export default (sequelize, DataTypes) => {
           defaultValue: 1
         },
         telegram_id: {
-          type: DataTypes.INTEGER,
+          type: DataTypes.BIGINT,
           allowNull: false
         },
         current_order_id: {

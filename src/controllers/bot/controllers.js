@@ -192,7 +192,7 @@ export default class Controllers {
     // MENU
 
     static async sendMenu(ctx, additional) {
-        await ctx.reply((additional ? additional + "\n" : '') + messages[ctx.session.user.lang].menuMsg, {
+        await ctx.reply((additional ? additional + "\n" : '') + messages[ctx.session.user.lang].menuMsg(ctx.session.user.id), {
             parse_mode: "HTML",
             reply_markup: InlineKeyboards[ctx.session.user.lang].menu
         })
@@ -393,7 +393,7 @@ export default class Controllers {
         } = queryString.parseUrl(ctx.callbackQuery.data)
         switch (query.step) {
             case "menu":
-                await ctx.editMessageText(messages[ctx.session.user.lang].menuMsg, {
+                await ctx.editMessageText(messages[ctx.session.user.lang].menuMsg(ctx.session.user.id), {
                     parse_mode: "HTML",
                     message_id: ctx.callbackQuery.message.message_id,
                     reply_markup: InlineKeyboards[ctx.session.user.lang].menu
@@ -875,14 +875,12 @@ export default class Controllers {
     static async cancelOrderProccess(ctx) {
         try {
             ctx.session.order = {}
-
             const user = await users.findOne({
                 where: {
-                    telegram_id: ctx.session.user.id
+                    telegram_id: ctx.session.user.tgid
                 },
                 raw: true
             })
-
             const order = await orders.findOne({
                 where: {
                     id: user.current_order_id
