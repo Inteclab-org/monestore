@@ -83,25 +83,28 @@ async function tgBot() {
     await bot.api.setMyCommands([{
             command: "start",
             description: "Start the bot"
-        },
-        { command: "/menu", description: "Show help text" },
+        }
     ]);
 
-    bot.command("menu", async (ctx) => {
-        const chat_id = ctx.msg.chat.id
-        let user = await users.findOne({
-            where: {
-                telegram_id: chat_id
-            },
-            raw: true
-        })
+    // bot.command("menu", async (ctx) => {
+    //     const chat_id = ctx.msg.chat.id
+    //     let user = await users.findOne({
+    //         where: {
+    //             telegram_id: chat_id
+    //         },
+    //         raw: true
+    //     })
 
-        if(user){
-            await sendMenu(ctx)
-        }else{
-            await ctx.reply("Siz ro'yxatdan o'tmagansiz!\nYou are not registered!")
-        }
-    })
+    //     if (user.step == "order") {
+    //         await ctx.reply(messages[user.language_code].orderingMsg)
+    //     }
+
+    //     if(user){
+    //         await sendMenu(ctx)
+    //     }else{
+    //         await ctx.reply("Siz ro'yxatdan o'tmagansiz!\nYou are not registered!")
+    //     }
+    // })
 
     bot.command("start", async (ctx, next) => {
         const chat_id = ctx.msg.chat.id
@@ -159,18 +162,11 @@ async function tgBot() {
         if (user.step == "menu") {
             await sendMenu(ctx)
         }
-        if (user.step == "payment") {
-            const order = await orders.findOne({
-                where: {
-                    id: user.current_order_id
-                },
-                raw: true
-            })
-            if (order.payment_pending == false) {
-                await ctx.reply(messages[user.language_code].paymentNotCheckedMsg)
-            }else{
-                await ctx.reply(messages[user.language_code].waitVerificationMsg)
-            }
+        else if (user.step == "order") {
+            await ctx.reply(messages[user.language_code].orderingMsg)
+        }
+        else {
+            next()
         }
     })
 
@@ -203,7 +199,7 @@ async function tgBot() {
 
     const router = new Router((ctx) => ctx.session.step)
 
-    bot.hears(["Bekor qilish", "Отмена"], async (ctx) => {
+    bot.hears(["Bekor qilish", "Отмена"], async (ctx, next) => {
         switch (ctx.session.step) {
             case "order":
             case "payment":
@@ -214,10 +210,11 @@ async function tgBot() {
                 break;
         
             default:
+                next()
                 break;
         }
     })
-    bot.hears(["Tasdiqlash", "Подтвердить"], async (ctx) => {
+    bot.hears(["Tasdiqlash", "Подтвердить"], async (ctx, next) => {
         switch (ctx.session.step) {
             case "order":
                 let v = await endOrderProccess(ctx)
@@ -227,11 +224,11 @@ async function tgBot() {
                 break;
         
             default:
+                next()
                 break;
         }
     })
-    bot.hears(["Ha", "Да"], async (ctx) => {
-        console.log("HA", `\n${ctx.session.step}`);
+    bot.hears(["Ha", "Да"], async (ctx, next) => {
         switch (ctx.session.step) {
             case "verify":
                 await saveOrder(ctx)
@@ -239,10 +236,11 @@ async function tgBot() {
                 await updateUserStep(ctx, ctx.session.step)
                 break;
             default:
+                next()
                 break;
         }
     })
-    bot.hears(["Yo'q", "Нет"], async (ctx) => {
+    bot.hears(["Yo'q", "Нет"], async (ctx, next) => {
         switch (ctx.session.step) {
             case "verify":
                 await continueOrderProccess(ctx)
@@ -250,6 +248,7 @@ async function tgBot() {
                 await updateUserStep(ctx, ctx.session.step)
                 break;
             default:
+                next()
                 break;
         }
     })
@@ -400,10 +399,16 @@ async function tgBot() {
                 break;
 
             case "set_size":
-                await setItemSize(ctx)
+                let a = await setItemSize(ctx)
+                if(!a) return 
+                ctx.session.step = "order"
+                await updateUserStep(ctx, ctx.session.step)
                 break
             case "set_amount":
-                await setItemAmount(ctx)
+                let b = await setItemAmount(ctx)
+                if(!b) return 
+                ctx.session.step = "order"
+                await updateUserStep(ctx, ctx.session.step)
                 break
             case "set_cost":
                 await getManualCost(ctx)

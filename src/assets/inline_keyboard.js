@@ -62,10 +62,10 @@ const InlineKeyboards = {
 
         user_info_menu: (step) =>
             new InlineKeyboard()
-            .text("✏️ Ismni o'zgartirish", `change_user_info?step=name`)
-            .text("✏️ Raqamni o'zgartirish", `change_user_info?step=phone`)
+            .text("👤 Ismni o'zgartirish", `change_user_info?step=name`)
+            .text("📱 Raqamni o'zgartirish", `change_user_info?step=phone`)
             .row()
-            .text("✏️ Tilni o'zgartirish", `change_user_info?step=lang`)
+            .text("🇺🇿🇷🇺 Tilni o'zgartirish", `change_user_info?step=lang`)
             .row()
             .text("Orqaga ↩️", `back?step=${step}`),
         order_sections_menu: (step) =>
@@ -129,10 +129,10 @@ const InlineKeyboards = {
 
         user_info_menu: (step) =>
             new InlineKeyboard()
-            .text("✏️ Изменить имя", `change_user_info?step=name`)
-            .text("✏️ Изменить номер телефона ", `change_user_info?step=phone`)
+            .text("👤 Изменить имя", `change_user_info?step=name`)
+            .text("📱 Изменить номер телефона ", `change_user_info?step=phone`)
             .row()
-            .text("✏️ Изменить язык", `change_user_info?step=lang`)
+            .text("🇺🇿🇷🇺 Изменить язык", `change_user_info?step=lang`)
             .row()
             .text("Назад ↩️", `back?step=${step}`),
 

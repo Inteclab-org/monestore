@@ -164,7 +164,6 @@ export default class Controllers {
                 let x = await ctx.reply(messages[ctx.session.user.lang].invalidNumberMsg, {
                     parse_mode: "HTML",
                 })
-                console.log(test);
                 // ctx.session.messages_to_delete.push(ctx.message.message_id)
                 // ctx.session.messages_to_delete.push(x.message_id)
                 return false
@@ -220,7 +219,8 @@ export default class Controllers {
                 if(order.status != 5 && order.status == s){
                     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                         text: messages[ctx.session.user.lang].statusMessages[s]+messages[ctx.session.user.lang].cannotOrderMsg,
-                        show_alert: true
+                        show_alert: true,
+                        parse_mode: "HTML"
                     })
                     return false
                 }
@@ -274,9 +274,9 @@ export default class Controllers {
         if (language == "ru") language = "Russian"
 
         await ctx.editMessageText(
-            `Sozlamalar:\n\n<i>Ismingiz:</i>  <b>${user.full_name}</b>
-            \n<i>Telefon raqamingiz:</i>  <b>${user.phone_number}</b>
-            \n<i>Tanlangan til:</i>  <b>${language}</b>`, {
+            `Sozlamalar:\n\n👤 <i> FIO:</i>  <b>${user.full_name}</b> <b>#${user.id}</b>
+            \n📱 <i> Telefon raqamingiz:</i>  <b>${user.phone_number}</b>
+            \n🌐 <i>Tanlangan til:</i>  <b>${language}</b>`, {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
                 reply_markup: InlineKeyboards[ctx.session.user.lang].user_info_menu("menu")
@@ -486,7 +486,8 @@ export default class Controllers {
             if (ctx.session.step == "verify") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].isVerifyingMsg,
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
@@ -517,6 +518,8 @@ export default class Controllers {
                 keyboard = InlineKeyboards[ctx.session.user.lang].edit_item_menu(query.item_id)
             }
 
+            ctx.session.order[query.item_id].size = query.size
+
             await editMessage(ctx,
                 ctx.callbackQuery.message.message_id,
                 type,
@@ -524,10 +527,17 @@ export default class Controllers {
                 keyboard
             )
 
-            ctx.session.order[query.item_id].size = query.size
+            if (query.item_id == ctx.session.editing_item.item_id) {
+                ctx.session.editing_item.item_id = null
+                ctx.session.editing_item.message_id = null
+                ctx.session.editing_item.message_type = "text"
+                ctx.session.editing_item.message_content = ""
+
+                await cleanMessages(ctx)
+            }
 
             await ctx.answerCallbackQuery()
-
+            return true
         } catch (error) {
             console.log(error);
         }
@@ -542,7 +552,8 @@ export default class Controllers {
             if (ctx.session.step == "verify") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].isVerifyingMsg,
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
@@ -590,6 +601,8 @@ export default class Controllers {
 
             await ctx.answerCallbackQuery()
 
+            return true
+
         } catch (error) {
             console.log(error);
         }
@@ -604,7 +617,8 @@ export default class Controllers {
             if (ctx.session.step == "size") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].finishManualSizeMsg(ctx.session.editing_item.item_id),
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
@@ -612,7 +626,8 @@ export default class Controllers {
             if (ctx.session.step == "verfiy") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].isVerifyingMsg,
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
@@ -655,7 +670,8 @@ export default class Controllers {
             if (ctx.session.step == "amount") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].finishManualAmountMsg(ctx.session.editing_item.item_id),
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
@@ -663,7 +679,8 @@ export default class Controllers {
             if (ctx.session.step == "verfiy") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].isVerifyingMsg,
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
@@ -706,12 +723,13 @@ export default class Controllers {
             if (ctx.session.step == "verfiy") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].isVerifyingMsg,
-                    show_alert: true
+                    show_alert: true,
+                    parse_mode: "HTML"
                 })
                 return
             }
 
-            if (ctx.session.step != "payment") {
+            if (ctx.session.step != "payment" && ctx.session.step != "cost") {
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: messages[ctx.session.user.lang].notOrderingMsg+`\n${ctx.session.step}`,
                     show_alert: true,
@@ -806,7 +824,9 @@ export default class Controllers {
     static async setManualAmount(ctx) {
         try {
             if (isNaN(ctx.msg.text)) {
-                let m = await ctx.reply(messages[ctx.session.user.lang].notNumberMsg)
+                let m = await ctx.reply(messages[ctx.session.user.lang].notNumberMsg, {
+                    parse_mode: "HTML"
+                })
                 ctx.session.messages_to_delete.push(m.message_id)
                 ctx.session.messages_to_delete.push(ctx.msg.message_id)
                 return false
@@ -1022,7 +1042,9 @@ export default class Controllers {
     static async setCost(ctx){
         try {
             if (isNaN(ctx.msg.text)) {
-                let m = await ctx.reply(messages[ctx.session.user.lang].notNumberMsg)
+                let m = await ctx.reply(messages[ctx.session.user.lang].notNumberCostMsg, {
+                    parse_mode: "HTML"
+                })
                 ctx.session.messages_to_delete.push(m.message_id)
                 ctx.session.messages_to_delete.push(ctx.msg.message_id)
                 return false
