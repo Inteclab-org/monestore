@@ -30,7 +30,7 @@ const InlineKeyboards = {
                     text: "◀️",
                     callback_data: `prev?page=${Number(page) - 1}` 
                 },{
-                    text: `${page}/${pages}`,
+                    text: `${Number(page) + 1}/${pages}`,
                     callback_data: `select_orders_page?pages=${pages}`
                 },{
                     text: "▶️",

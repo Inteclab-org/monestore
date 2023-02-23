@@ -325,7 +325,7 @@ export default class Controllers {
             ]
         })
 
-        if (offset >= count) {
+        if (offset > count || offset < 0) {
             await ctx.answerCallbackQuery()
             return
         }
