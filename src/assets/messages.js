@@ -60,7 +60,7 @@ const messages = {
     amount: "🔢 Miqdor",
     costSetMsg: (order_id, cost, text) => `${order_id}-buyurtmangizning umumiy narxi <b>${cost}</b> so'm etib belgilandi. \nQo'shimcha izoh: ${text ? `<b>${text}</b>` : "<i>mavjud emas</i>"}. \nTo'lovni tasdiqlovchi chek rasmini (screenshot) jo'nating.`,
     orderInfoMsg: (order) => `🆔: ${order.id}\n🛍<i>Mahsulotlar soni</i>: <b>${order.order_items.length}</b> ta\n💲<i>Narx</i>: <b>${order.price ? order.price + "so'm" : "belgilanishi kutilmoqda 🕢"}</b>\n💵<i>To'lov</i> <b>${order.is_paid ? "qilingan ✅" : "qilinmagan ❌"}</b>\n\n`,
-    orderItemInfoMsg: (item) => `<i>O'lcham</i>: <b>${item.size}</b>\n<i>Miqdor</i>: <b>${item.amount}</b>${item.link ? "\n\n🔗 <i>Link</i>: " + item.link : ""}`,
+    orderItemInfoMsg: (item) => `🆔 <i>Buyurtma</i>: ${item.order_id}\n\n🔷 <i>O'lcham</i>: <b>${item.size}</b>\n🔢 <i>Miqdor</i>: <b>${item.amount}</b>${item.link ? "\n\n🔗 <i>Link</i>: " + item.link : ""}`,
     statusMessages: {
       "1": "Hozirgi buyurtmangizga hali narx belgilanmadi!",
       "2": "Hozirgi buyurtmangizga to'lov qilinmagan. Iltimos, to'lovni tasdiqlovchi rasmni jo'naiting!",
