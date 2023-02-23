@@ -54,22 +54,38 @@ const InlineKeyboards = {
         },
 
         pages: (pages, step) => {
-            const menu = [
-                [{
-                    text: "Orqaga ↩️", 
-                    callback_data: `back?step=${step}`
-                }]
-            ]
-            if (pages.length) {
-                const pgs = []
-                for (const page of pages) {
-                    pgs.push({
-                        text: `${Number(page) + 1}`, 
-                        callback_data: `page_selected?page=${page}`
-                    })
-                }
-                menu.unshift(pgs)
+            const pgs = []
+            for (let a = 0; a < pages; a++) {
+                pgs.push(a)
             }
+            const menu = []
+            let row = []
+
+            const buttons_count_in_row = 4
+
+            if (pgs.length) {
+                for (var i = 0; i < pgs.length; i+=buttons_count_in_row) {
+                    row = [{
+                        text: `${Number(pgs[i]) + 1}`, 
+                        callback_data: `page_selected?page=${pgs[i]}`
+                    }]
+
+                    for (var x = i+1; x < i+buttons_count_in_row; x++) {
+                        if (pgs[x]) {
+                            row.push({
+                                text: `${Number(pgs[x]) + 1}`, 
+                                callback_data: `page_selected?page=${pgs[x]}`
+                            })
+                        }
+                    }
+                    console.log(i, x);
+                    menu.push(row)
+                }
+            }
+            menu.push([{
+                text: "Orqaga ↩️", 
+                callback_data: `back?step=${step}`
+            }])
             return menu
         },
 
@@ -207,7 +223,6 @@ const InlineKeyboards = {
                 text: "Назад ↩️", 
                 callback_data: `back?step=${step}`
             }])
-            console.log(menu);
             return menu
         },
 
