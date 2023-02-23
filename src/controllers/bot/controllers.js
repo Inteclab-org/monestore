@@ -860,11 +860,11 @@ export default class Controllers {
     static async setManualSize(ctx) {
         try {
 
-            let text = ctx.session.editing_item.message_content + `\nO'lcham: ${ctx.msg.text.toUpperCase()}`
+            let text = ctx.session.editing_item.message_content + `\n${messages[ctx.session.user.lang].size}: ${ctx.msg.text.toUpperCase()}`
             let keyboard = InlineKeyboards[ctx.session.user.lang].amount_menu(ctx.session.editing_item.item_id)
 
             if (ctx.session.order[ctx.session.editing_item.item_id].amount != undefined) {
-                text = ctx.session.editing_item.message_content.replace(`O'lcham: ${ctx.session.order[ctx.session.editing_item.item_id].size.toUpperCase()}`, `O'lcham: ${ctx.msg.text.toUpperCase()}`)
+                text = ctx.session.editing_item.message_content.replace(`${messages[ctx.session.user.lang].size}: ${ctx.session.order[ctx.session.editing_item.item_id].size.toUpperCase()}`, `${messages[ctx.session.user.lang].size}: ${ctx.msg.text.toUpperCase()}`)
                 text = text.replace("✏️", "✅")
                 keyboard = InlineKeyboards[ctx.session.user.lang].edit_item_menu(ctx.session.editing_item.item_id)    
             }
@@ -903,10 +903,10 @@ export default class Controllers {
                 return false
             }
 
-            let text = ctx.session.editing_item.message_content + `\nMiqdor: ${ctx.msg.text}\n\n✅`
+            let text = ctx.session.editing_item.message_content + `\n${messages[ctx.session.user.lang].amount}: ${ctx.msg.text}\n\n✅`
 
             if (ctx.session.order[ctx.session.editing_item.item_id].amount != undefined) {
-                text = ctx.session.editing_item.message_content.replace(`Miqdor: ${ctx.session.order[ctx.session.editing_item.item_id].amount}`, `Miqdor: ${ctx.msg.text}`)
+                text = ctx.session.editing_item.message_content.replace(`${messages[ctx.session.user.lang].amount}: ${ctx.session.order[ctx.session.editing_item.item_id].amount}`, `${messages[ctx.session.user.lang].amount}: ${ctx.msg.text}`)
                 text = text.replace("✏️", "✅")
             }
 
