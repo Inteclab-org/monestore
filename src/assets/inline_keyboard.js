@@ -31,7 +31,7 @@ const InlineKeyboards = {
                     callback_data: `prev?page=${Number(page) - 1}` 
                 },{
                     text: `${Number(page) + 1}/${pages}`,
-                    callback_data: `select_orders_page?pages=${pages}`
+                    callback_data: `orders_pages?pages=${pages}`
                 },{
                     text: "▶️",
                     callback_data: `next?page=${Number(page) + 1}` 
@@ -49,6 +49,26 @@ const InlineKeyboards = {
                     })
                 }
                 menu.unshift(ids)
+            }
+            return menu
+        },
+
+        pages: (pages, step) => {
+            const menu = [
+                [{
+                    text: "Orqaga ↩️", 
+                    callback_data: `back?step=${step}`
+                }]
+            ]
+            if (pages.length) {
+                const pgs = []
+                for (const page of pages) {
+                    pgs.push({
+                        text: `${Number(page) + 1}`, 
+                        callback_data: `page_selected?page=${page}`
+                    })
+                }
+                menu.unshift(pgs)
             }
             return menu
         },
@@ -131,7 +151,7 @@ const InlineKeyboards = {
                     callback_data: `prev?page=${Number(page) - 1}` 
                 },{
                     text: `${Number(page) + 1}/${pages}`,
-                    callback_data: `select_orders_page?pages=${pages}`
+                    callback_data: `orders_pages?pages=${pages}`
                 },{
                     text: "▶️",
                     callback_data: `next?page=${Number(page) + 1}` 
@@ -151,6 +171,43 @@ const InlineKeyboards = {
                 }
                 menu.unshift(ids)
             }
+            return menu
+        },
+
+        pages: (pages, step) => {
+            const pgs = []
+            for (let a = 0; a < pages; a++) {
+                pgs.push(a)
+            }
+            const menu = []
+            let row = []
+
+            const buttons_count_in_row = 4
+
+            if (pgs.length) {
+                for (var i = 0; i < pgs.length; i+=buttons_count_in_row) {
+                    row = [{
+                        text: `${Number(pgs[i]) + 1}`, 
+                        callback_data: `page_selected?page=${pgs[i]}`
+                    }]
+
+                    for (var x = i+1; x < i+buttons_count_in_row; x++) {
+                        if (pgs[x]) {
+                            row.push({
+                                text: `${Number(pgs[x]) + 1}`, 
+                                callback_data: `page_selected?page=${pgs[x]}`
+                            })
+                        }
+                    }
+                    console.log(i, x);
+                    menu.push(row)
+                }
+            }
+            menu.push([{
+                text: "Назад ↩️", 
+                callback_data: `back?step=${step}`
+            }])
+            console.log(menu);
             return menu
         },
 

@@ -197,6 +197,24 @@ export default class Controllers {
         })
     }
 
+    static async sendPagesMenu(ctx, pages, edit = false) {
+        if (edit) 
+            await ctx.editMessageText(messages[ctx.session.user.lang].selectPageMsg, {
+                    message_id: ctx.callbackQuery.message.message_id,
+                    parse_mode: "HTML",
+                    reply_markup: {
+                        inline_keyboard: InlineKeyboards[ctx.session.user.lang].pages(pages, "orders_list_edit")
+                    }
+                })
+        else
+            await ctx.reply(messages[ctx.session.user.lang].selectPageMsg, {
+                parse_mode: "HTML",
+                reply_markup: {
+                    inline_keyboard: InlineKeyboards[ctx.session.user.lang].pages(pages, "orders_list_edit")
+                }
+            })
+    }
+
     static async openOrderMenu(ctx) {
         const user = await users.findOne({
             where: {
@@ -398,14 +416,14 @@ export default class Controllers {
                 ctx.callbackQuery.message.message_id, {
                 caption: messages[ctx.session.user.lang].orderItemInfoMsg(data[0]),
                 parse_mode: "HTML",
-                reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, "orders_list")
+                reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, "orders_list_send")
             })
         }else{
             await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id)
             await ctx.replyWithPhoto(`https://api.monestore.uz/uploads/${data[0].image_id ? "files/" + data[0].image_id : "placeholder/placeholder.jpg"}`, {
                     caption: messages[ctx.session.user.lang].orderItemInfoMsg(data[0]) ,
                     parse_mode: "HTML",
-                    reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, "orders_list")
+                    reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, "orders_list_send")
             })
         }
 
@@ -465,9 +483,13 @@ export default class Controllers {
                 await Controllers.openMyOrdersMenu(ctx)
                 break;
                 
-            case "orders_list":
+            case "orders_list_send":
                 await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id)
                 await Controllers.sendOrders(ctx, ctx.session.orders_page)
+                break;
+                
+            case "orders_list_edit":
+                await Controllers.sendOrders(ctx, ctx.session.orders_page, true)
                 break;
         
             case "payment":
