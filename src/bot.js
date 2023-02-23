@@ -41,7 +41,8 @@ const {
     getManualSize,
     setManualSize,
     setCost,
-    getManualCost
+    getManualCost,
+    sendOrderItems
 } = Controlers
 import messages from './assets/messages.js'
 import InlineKeyboards from './assets/inline_keyboard.js'
@@ -69,6 +70,7 @@ async function tgBot() {
             },
             messages_to_delete: [],
             last_sent_link_message: null,
+            orders_page: 0,
             payment_image_received: false,
             order: {},
             editing_item: {
@@ -271,15 +273,16 @@ async function tgBot() {
     })
 
     router.route("phone", async (ctx) => {
+        console.log(ctx);
         let p = await setPhone(ctx)
         if (!p) return
-        // await ctx.reply(messages[ctx.session.user.lang].regSuccessMsg, {
-        //     parse_mode: "HTML",
-        //     reply_markup: {
-        //         remove_keyboard: true
-        //     }
-        // })
-        await sendMenu(ctx, messages[ctx.session.user.lang].regSuccessMsg)
+        await ctx.reply(messages[ctx.session.user.lang].regSuccessMsg, {
+            parse_mode: "HTML",
+            reply_markup: {
+                remove_keyboard: true
+            }
+        })
+        await sendMenu(ctx)
         ctx.session.step = "menu"
         await updateUserStep(ctx, ctx.session.step)
     })
@@ -338,6 +341,7 @@ async function tgBot() {
         })
         ctx.session.step = "menu"
         await updateUserStep(ctx, ctx.session.step)
+        // ctx.api.editMessageMedia(de,ede,{type: ""})
     })
 
     bot.on("callback_query:data", async (ctx) => {
@@ -372,19 +376,28 @@ async function tgBot() {
                 await updateUserStep(ctx, ctx.session.step)
                 break;
             case "my_orders":
-                await openMyOrdersMenu(ctx, 0)
+                await openMyOrdersMenu(ctx)
                 break;
             case "next":
-                await sendOrders(ctx, query.offset)
+                await sendOrders(ctx, query.page, true)
                 break;
             case "prev":
-                await sendOrders(ctx, query.offset)
+                await sendOrders(ctx, query.page, true)
+                break;
+            case "next_item":
+                await sendOrderItems(ctx, query.order_id, query.page, true)
+                break;
+            case "prev_item":
+                await sendOrderItems(ctx, query.order_id, query.page, true)
                 break;
             case "current_order":
                 await sendCurrentOrder(ctx)
                 break;
             case "all_orders":
-                await sendOrders(ctx, 0)
+                await sendOrders(ctx, null, true)
+                break;
+            case "order_selected":
+                await sendOrderItems(ctx, query.order_id)
                 break;
             case "settings":
                 await openSettingsMenu(ctx)
@@ -436,6 +449,7 @@ async function tgBot() {
                 break
 
             default:
+                await ctx.answerCallbackQuery()
                 break;
         }
     })
@@ -465,6 +479,7 @@ async function sendCost(user, order_id, cost, text){
 
 async function sendVerification(user, valid){
     let text = valid ? messages[user.language_code].paymentVerifiedMsg : messages[user.language_code].paymentNotVerifiedMsg
+
     await bot.api.sendMessage(user.telegram_id, text, {
         parse_mode: "HTML",
         reply_markup: {
@@ -472,11 +487,12 @@ async function sendVerification(user, valid){
         }
     })
     if (valid) {
-        await bot.api.sendMessage(user.telegram_id, messages[user.language_code].menuMsg, {
+        await bot.api.sendMessage(user.telegram_id, messages[user.language_code].menuMsg(user.id), {
             parse_mode: "HTML",
             reply_markup: InlineKeyboards[user.language_code].menu
         })
     }
+ 
 }
 
 export {

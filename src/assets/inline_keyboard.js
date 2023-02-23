@@ -4,8 +4,8 @@ import { InlineKeyboard } from "grammy";
 
 const InlineKeyboards = {
     select_language: new InlineKeyboard()
-        .text("Uzbek", "set_language?value=uz")
-        .text("Russian", "set_language?value=ru"),
+        .text("🇺🇿 Uzbek", "set_language?value=uz")
+        .text("🇷🇺 Russian", "set_language?value=ru"),
 
     uz: {
         menu: new InlineKeyboard()
@@ -17,11 +17,41 @@ const InlineKeyboards = {
         set_cost: new InlineKeyboard()
             .text("Narx belgilash", "set_cost"),
 
-        menu_switch: (offset, step) => new InlineKeyboard()
-            .text("◀️", `prev?offset=${Number(offset) - 1}`)
-            .text("▶️", `next?offset=${Number(offset) + 1}`)
+        item_menu_switch: (order_id, pages, page, step) => new InlineKeyboard()
+            .text("◀️", `prev_item?order_id=${order_id}&page=${Number(page) - 1}`)
+            .text(`${Number(page) + 1}/${pages}`, "void")
+            .text("▶️", `next_item?order_id=${order_id}&page=${Number(page) + 1}`)
             .row()
             .text("Orqaga ↩️", `back?step=${step}`),
+
+        order_menu_switch: (order_ids, pages, page, step) => {
+            const menu = [
+                [{
+                    text: "◀️",
+                    callback_data: `prev?page=${Number(page) - 1}` 
+                },{
+                    text: `${page}/${pages}`,
+                    callback_data: `select_orders_page?pages=${pages}`
+                },{
+                    text: "▶️",
+                    callback_data: `next?page=${Number(page) + 1}` 
+                }],[{
+                    text: "Orqaga ↩️", 
+                    callback_data: `back?step=${step}`
+                }]
+            ]
+            if (order_ids.length) {
+                const ids = []
+                for (const id of order_ids) {
+                    ids.push({
+                        text: `${id}`, 
+                        callback_data: `order_selected?order_id=${id}`
+                    })
+                }
+                menu.unshift(ids)
+            }
+            return menu
+        },
 
         order_first_step_menu: new InlineKeyboard()
             .url("🧾 Mahsulotlar", "https://google.com/Uy-va-texnika-jixozlari-03-11"),
@@ -35,23 +65,23 @@ const InlineKeyboards = {
             .text("L", `set_size?size=l&item_id=${item_id}`)
             .text("X", `set_size?size=x&item_id=${item_id}`)
             .row()
-            .text("Boshqa", `manual_size?item_id=${item_id}`),
+            .text("Boshqa o'lcham kiritish", `manual_size?item_id=${item_id}`),
 
         amount_menu: (item_id) =>
             new InlineKeyboard()
-            .text("1", `set_amount?value=1&item_id=${item_id}`)
-            .text("2", `set_amount?value=2&item_id=${item_id}`)
-            .text("3", `set_amount?value=3&item_id=${item_id}`)
-            .text("4", `set_amount?value=4&item_id=${item_id}`)
-            .text("5", `set_amount?value=5&item_id=${item_id}`)
+            .text("1 ta", `set_amount?value=1&item_id=${item_id}`)
+            .text("2 ta", `set_amount?value=2&item_id=${item_id}`)
+            .text("3 ta", `set_amount?value=3&item_id=${item_id}`)
+            .text("4 ta", `set_amount?value=4&item_id=${item_id}`)
+            .text("5 ta", `set_amount?value=5&item_id=${item_id}`)
             .row()
-            .text("6", `set_amount?value=6&item_id=${item_id}`)
-            .text("7", `set_amount?value=7&item_id=${item_id}`)
-            .text("8", `set_amount?value=8&item_id=${item_id}`)
-            .text("9", `set_amount?value=9&item_id=${item_id}`)
-            .text("10", `set_amount?value=10&item_id=${item_id}`)
+            .text("6 ta", `set_amount?value=6&item_id=${item_id}`)
+            .text("7 ta", `set_amount?value=7&item_id=${item_id}`)
+            .text("8 ta", `set_amount?value=8&item_id=${item_id}`)
+            .text("9 ta", `set_amount?value=9&item_id=${item_id}`)
+            .text("10 ta", `set_amount?value=10&item_id=${item_id}`)
             .row()
-            .text("Boshqa", `manual_amount?item_id=${item_id}`),
+            .text("Boshqa miqdor kiritish", `manual_amount?item_id=${item_id}`),
 
         edit_item_menu: (item_id) =>
             new InlineKeyboard()
@@ -84,11 +114,45 @@ const InlineKeyboards = {
             .text("⚙️ Настройки", "settings")
             .text("📦 Заказы", "my_orders"),
 
-        menu_switch: (offset, step) => new InlineKeyboard()
-            .text("◀️", `prev?offset=${Number(offset) - 1}`)
-            .text("▶️", `next?offset=${Number(offset) + 1}`)
+        set_cost: new InlineKeyboard()
+            .text("Указать цену", "set_cost"),
+
+        item_menu_switch: (order_id, pages, page, step) => new InlineKeyboard()
+            .text("◀️", `prev_item?order_id=${order_id}&page=${Number(page) - 1}`)
+            .text(`${Number(page) + 1}/${pages}`, "void")
+            .text("▶️", `next_item?order_id=${order_id}&page=${Number(page) + 1}`)
             .row()
             .text("Назад ↩️", `back?step=${step}`),
+
+        order_menu_switch: (order_ids, pages, page, step) => {
+            const menu = [
+                [{
+                    text: "◀️",
+                    callback_data: `prev?page=${Number(page) - 1}` 
+                },{
+                    text: `${Number(page) + 1}/${pages}`,
+                    callback_data: `select_orders_page?pages=${pages}`
+                },{
+                    text: "▶️",
+                    callback_data: `next?page=${Number(page) + 1}` 
+                }],[{
+                    text: "Назад ↩️", 
+                    callback_data: `back?step=${step}`
+                }]
+            ]
+            console.log(order_ids);
+            if (order_ids.length) {
+                const ids = []
+                for (const id of order_ids) {
+                    ids.push({
+                        text: `${id}`, 
+                        callback_data: `order_selected?order_id=${id}`
+                    })
+                }
+                menu.unshift(ids)
+            }
+            return menu
+        },
 
         order_first_step_menu: new InlineKeyboard()
             .url("🧾 Товары", "https://google.com/Uy-va-texnika-jixozlari-03-11"),
@@ -102,23 +166,23 @@ const InlineKeyboards = {
             .text("L", `set_size?size=l&item_id=${item_id}`)
             .text("X", `set_size?size=x&item_id=${item_id}`)
             .row()
-            .text("Другой", `manual_size?item_id=${item_id}`),
+            .text("Введит другое размер", `manual_size?item_id=${item_id}`),
 
         amount_menu: (item_id) =>
             new InlineKeyboard()
-            .text("1", `set_amount?value=1&item_id=${item_id}`)
-            .text("2", `set_amount?value=2&item_id=${item_id}`)
-            .text("3", `set_amount?value=3&item_id=${item_id}`)
-            .text("4", `set_amount?value=4&item_id=${item_id}`)
-            .text("5", `set_amount?value=5&item_id=${item_id}`)
+            .text("1 шт", `set_amount?value=1&item_id=${item_id}`)
+            .text("2 шт", `set_amount?value=2&item_id=${item_id}`)
+            .text("3 шт", `set_amount?value=3&item_id=${item_id}`)
+            .text("4 шт", `set_amount?value=4&item_id=${item_id}`)
+            .text("5 шт", `set_amount?value=5&item_id=${item_id}`)
             .row()
-            .text("6", `set_amount?value=6&item_id=${item_id}`)
-            .text("7", `set_amount?value=7&item_id=${item_id}`)
-            .text("8", `set_amount?value=8&item_id=${item_id}`)
-            .text("9", `set_amount?value=9&item_id=${item_id}`)
-            .text("10", `set_amount?value=10&item_id=${item_id}`)
+            .text("6 шт", `set_amount?value=6&item_id=${item_id}`)
+            .text("7 шт", `set_amount?value=7&item_id=${item_id}`)
+            .text("8 шт", `set_amount?value=8&item_id=${item_id}`)
+            .text("9 шт", `set_amount?value=9&item_id=${item_id}`)
+            .text("10 шт", `set_amount?value=10&item_id=${item_id}`)
             .row()
-            .text("Другой", `manual_amount?item_id=${item_id}`),
+            .text("Введит другое количество", `manual_amount?item_id=${item_id}`),
 
         edit_item_menu: (item_id) =>
             new InlineKeyboard()

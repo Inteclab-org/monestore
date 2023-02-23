@@ -148,10 +148,10 @@ export default class Controllers {
 
         let x = await ctx.reply(messages[ctx.session.user.lang].telMsg, {
             parse_mode: "HTML",
-            // reply_markup: {
-            //     resize_keyboard: true,
-            //     keyboard: Keyboards[ctx.session.user.lang].share_phone.build()
-            // }
+            reply_markup: {
+                resize_keyboard: true,
+                keyboard: Keyboards[ctx.session.user.lang].share_phone.build()
+            }
         })
 
     }
@@ -273,10 +273,7 @@ export default class Controllers {
         if (language == "uz") language = "Uzbek"
         if (language == "ru") language = "Russian"
 
-        await ctx.editMessageText(
-            `Sozlamalar:\n\n👤 <i> FIO:</i>  <b>${user.full_name}</b> <b>#${user.id}</b>
-            \n📱 <i> Telefon raqamingiz:</i>  <b>${user.phone_number}</b>
-            \n🌐 <i>Tanlangan til:</i>  <b>${language}</b>`, {
+        await ctx.editMessageText(messages[user.language_code].userInfoMsg(user.id, user.full_name, user.phone_number, language), {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
                 reply_markup: InlineKeyboards[ctx.session.user.lang].user_info_menu("menu")
@@ -296,12 +293,12 @@ export default class Controllers {
         await ctx.answerCallbackQuery()
     }
 
-    static async sendOrders(ctx, offset) {
+    static async sendOrders(ctx, page, edit = false) {
+        page = page || 0
+        ctx.session.orders_page = page
 
-        if (offset < 0) {
-            await ctx.answerCallbackQuery()
-            return
-        }
+        const limit = 5
+        const offset = page * limit
 
         let user = await users.findOne({
             where: {
@@ -312,6 +309,7 @@ export default class Controllers {
 
         let ordersText = ""
 
+        const count  = await orders.count()
         const allOrders = await orders.findAndCountAll({
             include: [{
                 model: order_items,
@@ -320,31 +318,96 @@ export default class Controllers {
             where: {
                 user_id: user.id
             },
-            limit: 1,
+            limit,
             offset: offset || 0,
             order: [
                 ["created_at", "DESC"]
             ]
         })
 
-        if (offset != 0 && offset >= allOrders.count) {
+        if (offset >= count) {
             await ctx.answerCallbackQuery()
             return
         }
 
+        const order_ids = []
+        const pages = Math.ceil(count / limit)
+
         for (const o of allOrders.rows) {
-            let isPaid = o.is_paid ? "qilingan✅" : "qilinmagan❌"
-            let price = o.price ? o.price + " so'm" : "belgilanishi kutilmoqda 🕢"
-            ordersText += 
-            `🆔: ${o.id}\n\n🛍<i>Mahsulotlar soni</i>: <b>${o.order_items.length}</b> ta\n💲<i>Narx</i>: <b>${price}</b>\n💵<i>To'lov</i> <b>${isPaid}</b>`
+            ordersText += messages[ctx.session.user.lang].orderInfoMsg(o) 
+            order_ids.push(o.id)
         }
 
-        await ctx.editMessageText(
-            `Buyurtmalar: \n\n ${ordersText}`, {
+        if (edit) 
+            await ctx.editMessageText(
+                messages[ctx.session.user.lang].allOrdersMsg(ordersText), {
+                    parse_mode: "HTML",
+                    message_id: ctx.callbackQuery.message.message_id,
+                    reply_markup: {
+                        inline_keyboard: InlineKeyboards[ctx.session.user.lang].order_menu_switch(order_ids, pages, page, "orders")
+                    }
+                })
+        else
+            await ctx.reply(
+                messages[ctx.session.user.lang].allOrdersMsg(ordersText), {
+                    parse_mode: "HTML",
+                    reply_markup: {
+                        inline_keyboard: InlineKeyboards[ctx.session.user.lang].order_menu_switch(order_ids, pages, page, "orders")
+                    }
+                }) 
+
+        await ctx.answerCallbackQuery()
+    }
+
+    static async sendOrderItems(ctx, order_id, page, edit = false) {
+        page = page || 0
+        const limit = 1
+        const offset = page * limit
+        const count = await order_items.count({
+            where: {
+                order_id
+            }
+        })
+        const data = await order_items.findAll({
+            where: {
+                order_id,
+            },
+            limit,
+            offset: offset || 0,
+            order: [
+                ["created_at", "DESC"]
+            ]
+        })
+        
+        if (offset >= count) {
+            await ctx.answerCallbackQuery()
+            return
+        }
+        
+        const pages = Math.ceil(count / limit)
+
+        if (edit) {
+            await ctx.api.editMessageMedia(
+                ctx.callbackQuery.message.chat.id, 
+                ctx.callbackQuery.message.message_id, {
+                    type: "photo",
+                    media: `https://api.monestore.uz/uploads/${data[0].image_id ? "files/" + data[0].image_id : "placeholder/placeholder.jpg"}`
+                })
+            await ctx.api.editMessageCaption(
+                ctx.callbackQuery.message.chat.id, 
+                ctx.callbackQuery.message.message_id, {
+                caption: messages[ctx.session.user.lang].orderItemInfoMsg(data[0]),
                 parse_mode: "HTML",
-                message_id: ctx.callbackQuery.message.message_id,
-                reply_markup: InlineKeyboards[ctx.session.user.lang].menu_switch(offset, "orders")
+                reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, "orders_list")
             })
+        }else{
+            await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id)
+            await ctx.replyWithPhoto(`https://api.monestore.uz/uploads/${data[0].image_id ? "files/" + data[0].image_id : "placeholder/placeholder.jpg"}`, {
+                    caption: messages[ctx.session.user.lang].orderItemInfoMsg(data[0]) ,
+                    parse_mode: "HTML",
+                    reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, "orders_list")
+            })
+        }
 
         await ctx.answerCallbackQuery()
     }
@@ -372,13 +435,11 @@ export default class Controllers {
         })
 
        if (o) {
-            let isPaid = o.is_paid ? "qilingan ✅" : "qilinmagan ❌"
-            let price = o.price ? o.price + " so'm" : "belgilanishi kutilmoqda 🕢"
-            ordersText += `🆔: ${o.id}\n\n🛍<i>Mahsulotlar soni</i>: <b>${o.order_items.length}</b> ta\n💲<i>Narx</i>: <b>${price}</b>\n💵<i>To'lov</i> <b>${isPaid}</b>`
+            ordersText += messages[ctx.session.user.lang].orderInfoMsg(o) 
        }
 
         await ctx.editMessageText(
-            `Hozirgi buyurtma: \n\n ${ordersText}`, {
+            messages[ctx.session.user.lang].currentOrderMsg(ordersText), {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
                 reply_markup: InlineKeyboards[ctx.session.user.lang].back("orders")
@@ -401,10 +462,16 @@ export default class Controllers {
                 break;
         
             case "orders":
-                Controllers.openMyOrdersMenu(ctx)
+                await Controllers.openMyOrdersMenu(ctx)
+                break;
+                
+            case "orders_list":
+                await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id)
+                await Controllers.sendOrders(ctx, ctx.session.orders_page)
                 break;
         
             case "payment":
+                console.log(ctx.session.user);
                 await ctx.editMessageText(messages[ctx.session.user.lang].waitCostMsg, {
                     parse_mode: "HTML",
                     message_id: ctx.callbackQuery.message.message_id,
@@ -492,16 +559,6 @@ export default class Controllers {
                 return
             }
 
-            // if(ctx.session.step != "order"){
-            //     console.log(ctx.session.step);
-            //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-            //         text: messages[ctx.session.user.lang].notOrderingMsg,
-            //         show_alert: true,
-            //         parse_mode: "HTML"
-            //     })
-            //     return
-            // }
-
             let type = "text",
                 mType = "text"
             if (ctx.callbackQuery.message.photo) {
@@ -509,11 +566,11 @@ export default class Controllers {
                 mType = "caption"
             }
 
-            let text = ctx.callbackQuery.message[mType] + `\nO'lcham: ${query.size.toUpperCase()}`
+            let text = ctx.callbackQuery.message[mType] + `\n${messages[ctx.session.user.lang].size}: ${query.size.toUpperCase()}`
             let keyboard = InlineKeyboards[ctx.session.user.lang].amount_menu(query.item_id)
-
+            console.log(query.item_id);
             if (ctx.session.order[query.item_id].size != undefined) {
-                text = ctx.callbackQuery.message[mType].replace(`O'lcham: ${ctx.session.order[query.item_id].size.toUpperCase()}`, `O'lcham: ${query.size.toUpperCase()}`)
+                text = ctx.callbackQuery.message[mType].replace(`${messages[ctx.session.user.lang].size}: ${ctx.session.order[query.item_id].size.toUpperCase()}`, `${messages[ctx.session.user.lang].size}: ${query.size.toUpperCase()}`)
                 text = text.replace("✏️", "✅")
                 keyboard = InlineKeyboards[ctx.session.user.lang].edit_item_menu(query.item_id)
             }
@@ -558,15 +615,6 @@ export default class Controllers {
                 return
             }
 
-            // if(ctx.session.step != "order"  && ctx.session.step != "amount"){
-            //     await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
-            //         text: messages[ctx.session.user.lang].notOrderingMsg,
-            //         show_alert: true,
-            //          parse_mode: "HTML"
-            //     })
-            //     return
-            // }
-
             let type = "text",
                 mType = "text"
             if (ctx.callbackQuery.message.photo) {
@@ -574,10 +622,10 @@ export default class Controllers {
                     mType = "caption"
             }
 
-            let text = ctx.callbackQuery.message[mType] + `\nMiqdor: ${query.value}\n\n✅`
+            let text = ctx.callbackQuery.message[mType] + `\n${messages[ctx.session.user.lang].amount}: ${query.value}\n\n✅`
 
             if (ctx.session.order[query.item_id].amount != undefined) {
-                text = ctx.callbackQuery.message[mType].replace(`Miqdor: ${ctx.session.order[query.item_id].amount}`, `Miqdor: ${query.value}`)
+                text = ctx.callbackQuery.message[mType].replace(`${messages[ctx.session.user.lang].amount}: ${ctx.session.order[query.item_id].amount}`, `${messages[ctx.session.user.lang].amount}: ${query.value}`)
                 text = text.replace("✏️", "✅")
             }
 
@@ -703,6 +751,7 @@ export default class Controllers {
             }
 
             let m = await ctx.reply(messages[ctx.session.user.lang].amountMsg, {
+                parse_mode: "HTML",
                 reply_to_message_id: ctx.callbackQuery.message.message_id
             })
 
@@ -755,7 +804,7 @@ export default class Controllers {
                 const msg = order.payment_pending 
                     ? messages[ctx.session.user.lang].orderHasPriceMsg
                     : messages[ctx.session.user.lang].orderHasPriceMsg 
-                        + messages[ctx.session.user.lang].notPaidMsg;
+                        + messages[ctx.session.user.lang].notPaidYetMsg;
 
                 await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
                     text: msg,
@@ -776,7 +825,7 @@ export default class Controllers {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
                 reply_markup: {
-                    inline_keyboard: InlineKeyboards.uz.back("payment").inline_keyboard
+                    inline_keyboard: InlineKeyboards[ctx.session.user.lang].back("payment").inline_keyboard
                 }
             })
 
@@ -1030,9 +1079,7 @@ export default class Controllers {
             })
             await ctx.reply(`${messages[ctx.session.user.lang].waitCostMsg}`, {
                 parse_mode: "HTML",
-                reply_markup: {
-                    inline_keyboard: InlineKeyboards[ctx.session.user.lang].set_cost.inline_keyboard
-                }
+                reply_markup: InlineKeyboards[ctx.session.user.lang].set_cost
             })
         } catch (error) {
             console.log(error);
