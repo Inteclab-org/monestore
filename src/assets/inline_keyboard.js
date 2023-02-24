@@ -22,7 +22,7 @@ const InlineKeyboards = {
             .text(`${Number(page) + 1}/${pages}`, "void")
             .text("▶️", `next_item?order_id=${order_id}&page=${Number(page) + 1}`)
             .row()
-            .text("Orqaga ↩️", `back?step=${step}`),
+            .text("Orqaga ↩️", `back?order_id=${order_id}&step=${step}`),
 
         order_menu_switch: (order_ids, pages, page, step) => {
             const menu = [
@@ -45,7 +45,7 @@ const InlineKeyboards = {
                 for (const id of order_ids) {
                     ids.push({
                         text: `${id}`, 
-                        callback_data: `order_selected?order_id=${id}`
+                        callback_data: `order_menu?order_id=${id}`
                     })
                 }
                 menu.unshift(ids)
@@ -142,6 +142,19 @@ const InlineKeyboards = {
             .row()
             .text("Orqaga ↩️", `back?step=${step}`),
 
+        order_menu: (order_id) => new InlineKeyboard()
+            .text("Chek rasmi", `order_payment_image?order_id=${order_id}`)
+            .text("Mahsulotlar", `order_items?order_id=${order_id}`)
+            .row()
+            .text("Orqaga ↩️", `back?step=orders_list_edit`),
+
+        current_order_menu: (order_id) => new InlineKeyboard()
+            .text("Chek rasmi", `order_payment_image?order_id=${order_id}`)
+            .text("Mahsulotlar", `current_order_items?order_id=${order_id}`)
+            .row()
+            .text("Orqaga ↩️", `back?step=orders`),
+
+        payment_image_back: (order_id) => new InlineKeyboard().text("Orqaga ↩️", `back?step=order_menu&order_id=${order_id}`),
         back: (value) => new InlineKeyboard().text("Orqaga ↩️", `back?step=${value}`),
     },
     ru: {
@@ -159,7 +172,7 @@ const InlineKeyboards = {
             .text(`${Number(page) + 1}/${pages}`, "void")
             .text("▶️", `next_item?order_id=${order_id}&page=${Number(page) + 1}`)
             .row()
-            .text("Назад ↩️", `back?step=${step}`),
+            .text("Назад ↩️", `back?order_id=${order_id}&step=${step}`),
 
         order_menu_switch: (order_ids, pages, page, step) => {
             const menu = [
@@ -183,7 +196,7 @@ const InlineKeyboards = {
                 for (const id of order_ids) {
                     ids.push({
                         text: `${id}`, 
-                        callback_data: `order_selected?order_id=${id}`
+                        callback_data: `order_menu?order_id=${id}`
                     })
                 }
                 menu.unshift(ids)
@@ -280,6 +293,20 @@ const InlineKeyboards = {
             .text("🟢 Текущий", `current_order`)
             .row()
             .text("Назад ↩️", `back?step=${step}`),
+
+        order_menu: (order_id) => new InlineKeyboard()
+            .text("Изображение оплаты", `order_payment_image?order_id=${order_id}`)
+            .text("Продукты", `order_items?order_id=${order_id}`)
+            .row()
+            .text("Назад ↩️", `back?step=orders_list_edit`),
+
+        current_order_menu: (order_id) => new InlineKeyboard()
+            .text("Изображение оплаты", `order_payment_image?order_id=${order_id}`)
+            .text("Продукты", `current_order_items?order_id=${order_id}`)
+            .row()
+            .text("Назад ↩️", `back?step=orders`),
+
+        payment_image_back: (order_id) => new InlineKeyboard().text("Назад ↩️", `back?step=order_menu&order_id=${order_id}`),
 
         back: (value) => new InlineKeyboard().text("Назад ↩️", `back?step=${value}`),
     }

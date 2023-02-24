@@ -43,7 +43,9 @@ const {
     setCost,
     getManualCost,
     sendOrderItems,
-    sendPagesMenu
+    sendPagesMenu,
+    sendOrderPaymentImage,
+    sendOrderSectionsMenu
 } = Controlers
 import messages from './assets/messages.js'
 import InlineKeyboards from './assets/inline_keyboard.js'
@@ -397,8 +399,20 @@ async function tgBot() {
             case "all_orders":
                 await sendOrders(ctx, null, true)
                 break;
-            case "order_selected":
-                await sendOrderItems(ctx, query.order_id)
+            case "order_items":
+                await sendOrderItems(ctx, query.order_id, null, "order_menu")
+                break;
+            case "current_order_items":
+                await sendOrderItems(ctx, query.order_id, null, "current_order_menu")
+                break;
+            case "order_payment_image":
+                await sendOrderPaymentImage(ctx, query.order_id)
+                break;
+            case "order_menu":
+                await sendOrderSectionsMenu(ctx, query.order_id, "order_menu", true)
+                break;
+            case "current_order_menu":
+                await sendOrderSectionsMenu(ctx, query.order_id, "current_order_menu", true)
                 break;
             case "orders_pages":
                 await sendPagesMenu(ctx, query.pages, true)

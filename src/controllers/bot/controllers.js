@@ -6,6 +6,7 @@ import Keyboards from "../../assets/keyboards.js"
 import messages from "../../assets/messages.js"
 import sequelize from '../../db/db.js'
 import queryString from "query-string"
+import {default as fetch} from "node-fetch"
 
 import { validURL } from "../../modules/regex_url.js"
 
@@ -214,6 +215,29 @@ export default class Controllers {
                 }
             })
     }
+    static async sendOrderSectionsMenu(ctx, order_id, menu, edit = false) {
+        const o = await orders.findOne({
+            include: [{
+                model: order_items,
+                attributes: ["id"]
+            }],
+            where: {
+                id: order_id,
+            }
+        }) 
+
+        if (edit) 
+            await ctx.editMessageText(messages[ctx.session.user.lang].orderInfoMsg(o) + "\n" + messages[ctx.session.user.lang].chooseSectionMsg, {
+                    message_id: ctx.callbackQuery.message.message_id,
+                    parse_mode: "HTML",
+                    reply_markup: InlineKeyboards[ctx.session.user.lang][menu](order_id)
+                })
+        else
+            await ctx.reply(messages[ctx.session.user.lang].orderInfoMsg(o) + "\n" + messages[ctx.session.user.lang].chooseSectionMsg, {
+                parse_mode: "HTML",
+                reply_markup: InlineKeyboards[ctx.session.user.lang][menu](order_id)
+            })
+    }
 
     static async openOrderMenu(ctx) {
         const user = await users.findOne({
@@ -377,7 +401,7 @@ export default class Controllers {
         await ctx.answerCallbackQuery()
     }
 
-    static async sendOrderItems(ctx, order_id, page, edit = false) {
+    static async sendOrderItems(ctx, order_id, page, step, edit = false) {
         page = page || 0
         const limit = 1
         const offset = page * limit
@@ -416,14 +440,14 @@ export default class Controllers {
                 ctx.callbackQuery.message.message_id, {
                 caption: messages[ctx.session.user.lang].orderItemInfoMsg(data[0]),
                 parse_mode: "HTML",
-                reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, "orders_list_send")
+                reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, step)
             })
         }else{
             await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id)
             await ctx.replyWithPhoto(`https://api.monestore.uz/uploads/${data[0].image_id ? "files/" + data[0].image_id : "placeholder/placeholder.jpg"}`, {
                     caption: messages[ctx.session.user.lang].orderItemInfoMsg(data[0]) ,
                     parse_mode: "HTML",
-                    reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, "orders_list_send")
+                    reply_markup: InlineKeyboards[ctx.session.user.lang].item_menu_switch(order_id, pages, page, step)
             })
         }
 
@@ -457,11 +481,45 @@ export default class Controllers {
        }
 
         await ctx.editMessageText(
-            messages[ctx.session.user.lang].currentOrderMsg(ordersText), {
+            messages[ctx.session.user.lang].currentOrderMsg(ordersText) + "\n" + messages[ctx.session.user.lang].chooseSectionMsg, {
                 parse_mode: "HTML",
                 message_id: ctx.callbackQuery.message.message_id,
-                reply_markup: InlineKeyboards[ctx.session.user.lang].back("orders")
+                reply_markup: InlineKeyboards[ctx.session.user.lang].current_order_menu(o.id)
             })
+
+        await ctx.answerCallbackQuery()
+    }
+
+    static async sendOrderPaymentImage(ctx, order_id) {
+        const order = await orders.findOne({
+            where: {
+                id: order_id
+            },
+            attributes: ["payment_image_id"]
+        })
+
+        if(!order.payment_image_id){
+            await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                text: messages[ctx.session.user.lang].noPaymentImageMsg,
+                show_alert: true,
+            })
+            return
+        }
+        const image = await fetch(`https://api.monestore.uz/uploads/files/${order.payment_image_id}`)
+
+        if(image.status != 200){
+            await ctx.api.answerCallbackQuery(ctx.callbackQuery.id, {
+                text: messages[ctx.session.user.lang].noPaymentImageMsg,
+                show_alert: true,
+            })
+            return
+        }
+
+        await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id)
+        await ctx.replyWithPhoto(`https://api.monestore.uz/uploads/files/${order.payment_image_id}`, {
+                parse_mode: "HTML",
+                reply_markup: InlineKeyboards[ctx.session.user.lang].payment_image_back(order_id)
+        })
 
         await ctx.answerCallbackQuery()
     }
@@ -490,6 +548,16 @@ export default class Controllers {
                 
             case "orders_list_edit":
                 await Controllers.sendOrders(ctx, ctx.session.orders_page, true)
+                break;
+                
+            case "order_menu":
+                await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id)
+                await Controllers.sendOrderSectionsMenu(ctx, query.order_id, "order_menu")
+                break;
+                
+            case "current_order_menu":
+                await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id)
+                await Controllers.sendOrderSectionsMenu(ctx, query.order_id, "current_order_menu")
                 break;
         
             case "payment":
