@@ -123,6 +123,8 @@ export default class Controllers {
         await ctx.reply(messages[ctx.session.user.lang].nameMsg, {
             parse_mode: "HTML"
         })
+        ctx.session.step = "name"
+        await updateUserStep(ctx, ctx.session.step)
     }
 
     static async setName(ctx) {
@@ -298,7 +300,8 @@ export default class Controllers {
         ctx.session.last_sent_link_message = x.message_id
         await ctx.answerCallbackQuery()
 
-        return true
+        ctx.session.step = "order"
+        await updateUserStep(ctx, ctx.session.step)
     }
 
     static async openSettingsMenu(ctx) {
@@ -684,7 +687,8 @@ export default class Controllers {
             }
 
             await ctx.answerCallbackQuery()
-            return true
+            ctx.session.step = "order"
+            await updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }
@@ -738,9 +742,8 @@ export default class Controllers {
             }
 
             await ctx.answerCallbackQuery()
-
-            return true
-
+            ctx.session.step = "order"
+            await updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }
@@ -794,6 +797,8 @@ export default class Controllers {
             ctx.session.messages_to_delete.push(m.message_id)
 
             await ctx.answerCallbackQuery()
+            ctx.session.step = "size"
+            await updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }
@@ -848,6 +853,8 @@ export default class Controllers {
             ctx.session.messages_to_delete.push(m.message_id)
 
             await ctx.answerCallbackQuery()
+            ctx.session.step = "amount"
+            await updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }
@@ -920,6 +927,8 @@ export default class Controllers {
             })
 
             await ctx.answerCallbackQuery()
+            ctx.session.step = "cost"
+            await updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }

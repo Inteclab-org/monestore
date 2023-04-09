@@ -369,14 +369,9 @@ async function tgBot() {
                     return
                 }
                 await askName(ctx)
-                ctx.session.step = "name"
-                await updateUserStep(ctx, ctx.session.step)
                 break;
             case "new_order":
-                const x = await openOrderMenu(ctx)
-                if(!x) return
-                ctx.session.step = "order"
-                await updateUserStep(ctx, ctx.session.step)
+                await openOrderMenu(ctx)
                 break;
             case "my_orders":
                 await openMyOrdersMenu(ctx)
@@ -428,36 +423,21 @@ async function tgBot() {
                 break;
             case "back":
                 await backToMenu(ctx)
-                // ctx.session.step = "menu"
-                // await updateUserStep(ctx, ctx.session.step)
                 break;
-
             case "set_size":
-                let a = await setItemSize(ctx)
-                if(!a) return 
-                ctx.session.step = "order"
-                await updateUserStep(ctx, ctx.session.step)
+                await setItemSize(ctx)
                 break
             case "set_amount":
-                let b = await setItemAmount(ctx)
-                if(!b) return 
-                ctx.session.step = "order"
-                await updateUserStep(ctx, ctx.session.step)
+                await setItemAmount(ctx)
                 break
             case "set_cost":
                 await getManualCost(ctx)
-                ctx.session.step = "cost"
-                await updateUserStep(ctx, ctx.session.step)
                 break
             case "manual_amount":
                 await getManualAmount(ctx)
-                ctx.session.step = "amount"
-                await updateUserStep(ctx, ctx.session.step)
                 break
             case "manual_size":
                 await getManualSize(ctx)
-                ctx.session.step = "size"
-                await updateUserStep(ctx, ctx.session.step)
                 break
             case "change_size":
                 await changeToEditMenu(ctx, "sizes_menu")
