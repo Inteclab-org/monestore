@@ -124,7 +124,7 @@ export default class Controllers {
             parse_mode: "HTML"
         })
         ctx.session.step = "name"
-        await updateUserStep(ctx, ctx.session.step)
+        await Controllers.updateUserStep(ctx, ctx.session.step)
     }
 
     static async setName(ctx) {
@@ -301,7 +301,7 @@ export default class Controllers {
         await ctx.answerCallbackQuery()
 
         ctx.session.step = "order"
-        await updateUserStep(ctx, ctx.session.step)
+        await Controllers.updateUserStep(ctx, ctx.session.step)
     }
 
     static async openSettingsMenu(ctx) {
@@ -688,7 +688,7 @@ export default class Controllers {
 
             await ctx.answerCallbackQuery()
             ctx.session.step = "order"
-            await updateUserStep(ctx, ctx.session.step)
+            await Controllers.updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }
@@ -743,7 +743,7 @@ export default class Controllers {
 
             await ctx.answerCallbackQuery()
             ctx.session.step = "order"
-            await updateUserStep(ctx, ctx.session.step)
+            await Controllers.updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }
@@ -798,7 +798,7 @@ export default class Controllers {
 
             await ctx.answerCallbackQuery()
             ctx.session.step = "size"
-            await updateUserStep(ctx, ctx.session.step)
+            await Controllers.updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }
@@ -854,7 +854,7 @@ export default class Controllers {
 
             await ctx.answerCallbackQuery()
             ctx.session.step = "amount"
-            await updateUserStep(ctx, ctx.session.step)
+            await Controllers.updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }
@@ -928,7 +928,7 @@ export default class Controllers {
 
             await ctx.answerCallbackQuery()
             ctx.session.step = "cost"
-            await updateUserStep(ctx, ctx.session.step)
+            await Controllers.updateUserStep(ctx, ctx.session.step)
         } catch (error) {
             console.log(error);
         }
