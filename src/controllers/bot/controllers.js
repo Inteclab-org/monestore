@@ -879,7 +879,7 @@ export default class Controllers {
 
             const user = await users.findOne({
                 where: {
-                    id: ctx.session.user.id
+                    telegram_id: ctx.chat.id
                 },
                 raw: true
             })
@@ -1189,7 +1189,7 @@ export default class Controllers {
 
             const user = await users.findOne({
                 where: {
-                    id: ctx.session.user.id
+                    telegram_id: ctx.chat.id
                 },
                 raw: true
             })
@@ -1239,7 +1239,7 @@ export default class Controllers {
 
             const user = await users.findOne({
                 where: {
-                    id: ctx.session.user.id
+                    telegram_id: ctx.chat.id
                 },
                 raw: true
             })
